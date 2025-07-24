@@ -208,12 +208,14 @@ html.dark .settings-toggle:hover {
   flex-direction: column;
   gap: 1.5rem;
   padding: 2rem 1.5rem;
-  padding-top: 5rem; /* Space for close area */
+  padding-top: 5rem;
   transition: right 0.3s ease;
   z-index: 2000;
   align-items: flex-start;
   display: flex;
   overflow-y: auto;
+  visibility: hidden;
+  opacity: 0;
 }
 
 html.dark .menu-bar {
@@ -224,6 +226,8 @@ html.dark .menu-bar {
 
 .menu-bar.open {
   right: 0;
+  visibility: visible;
+  opacity: 1;
 }
 
 /* Menu overlay for closing */
@@ -328,6 +332,21 @@ html.dark .menu-toggle svg path {
   stroke: #fff !important;
 }
 
+/* Desktop - Hide mobile menu completely */
+@media (min-width: 769px) {
+  .menu-bar {
+    display: none !important;
+  }
+  
+  .menu-overlay {
+    display: none !important;
+  }
+  
+  .menu-toggle {
+    display: none !important;
+  }
+}
+
 /* Mobile Responsive Styles */
 @media (max-width: 768px) {
   nav {
@@ -348,8 +367,10 @@ html.dark .menu-toggle svg path {
   }
   
   .menu-bar {
-    width: 280px;
+    width: 320px;
+    max-width: 90vw;
     padding: 1.5rem 1rem;
+    padding-top: 4rem;
     gap: 1rem;
   }
   
@@ -382,13 +403,18 @@ html.dark .menu-toggle svg path {
     max-width: 100vw;
     right: -100vw;
     padding: 1.5rem 1rem;
-    padding-top: 4rem;
+    padding-top: 3rem;
+    gap: 0.5rem;
+  }
+  
+  .menu-bar.open {
+    right: 0;
   }
   
   .menu-bar a {
-    font-size: 1.2rem;
-    padding: 1rem 0;
-    font-weight: 600;
+    font-size: 1.1rem;
+    padding: 0.875rem 0;
+    font-weight: 500;
   }
 }
 

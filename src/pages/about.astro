@@ -735,6 +735,17 @@ import { SITE_TITLE } from '../consts';
         .section h2 {
           font-size: 1.5rem;
         }
+        
+        /* Remove left borders in dark mode on mobile only */
+        html.dark .profile-text {
+          border-left: none;
+        }
+        
+        html.dark .experience-item,
+        html.dark .education-item,
+        html.dark .activity-item {
+          border-left: none;
+        }
       }
     </style>
   </head>

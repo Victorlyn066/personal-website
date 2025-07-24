@@ -616,18 +616,26 @@ import { SITE_TITLE } from '../consts';
       @media (max-width: 480px) {
         body {
           overflow-x: hidden;
+          position: relative;
         }
         
         .hero-image {
           height: 180px;
-          position: relative;
-          left: 50%;
-          right: 50%;
-          margin-left: -50vw;
-          margin-right: -50vw;
           width: 100vw;
+          position: absolute;
+          left: 0;
+          right: 0;
+          top: 60px;
+          margin: 0;
           max-width: none;
           box-sizing: border-box;
+          z-index: 1;
+        }
+        
+        .hero-info {
+          margin-top: 240px;
+          position: relative;
+          z-index: 2;
         }
         
         .hero-content h1 {
@@ -741,18 +749,26 @@ import { SITE_TITLE } from '../consts';
       @media (max-width: 768px) {
         body {
           overflow-x: hidden;
+          position: relative;
         }
         
         .hero-image {
           height: 220px;
-          position: relative;
-          left: 50%;
-          right: 50%;
-          margin-left: -50vw;
-          margin-right: -50vw;
           width: 100vw;
+          position: absolute;
+          left: 0;
+          right: 0;
+          top: 70px;
+          margin: 0;
           max-width: none;
           box-sizing: border-box;
+          z-index: 1;
+        }
+        
+        .hero-info {
+          margin-top: 290px;
+          position: relative;
+          z-index: 2;
         }
         
         .hero-content h1 {

@@ -5,6 +5,6 @@ import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
 export default defineConfig({
-	site: 'https://victorlin-personal-website.vercel.app',
+	site: 'https://victorlyn.dev',
 	integrations: [mdx(), sitemap()],
 });

@@ -578,17 +578,153 @@ import { SITE_TITLE } from '../consts';
         border: 1px solid #666 !important;
       }
       
-      @media (max-width: 600px) {
+      /* Mobile Responsive Styles */
+      @media (max-width: 768px) {
+        .hero-image {
+          height: 250px;
+        }
+        
+        .hero-content h1 {
+          font-size: 2.2rem;
+        }
+        
+        .hero-info {
+          padding: 0.5rem 1rem;
+        }
+        
+        .hero-info .subtitle {
+          font-size: 1.1rem;
+        }
+        
+        .hero-contact-info {
+          flex-direction: column;
+          gap: 0.3rem;
+          font-size: 0.9rem;
+        }
+        
+        .about-container {
+          padding: 0.5rem;
+        }
+        
+        .section-nav {
+          gap: 0.5rem;
+          margin-bottom: 1rem;
+        }
+        
+        .nav-button {
+          padding: 0.5rem 0.75rem;
+          font-size: 0.8rem;
+          min-width: auto;
+        }
+        
+        .experience-item,
+        .education-item,
+        .activity-item {
+          padding: 1rem;
+          margin-bottom: 1rem;
+        }
+        
         .item-header {
           flex-direction: column;
+          align-items: flex-start;
+          gap: 0.3rem;
         }
-                 .hero-contact-info {
-           flex-direction: column;
-           gap: 0.5em;
-         }
-         .hero-content h1 {
-           font-size: 2.2em;
-         }
+        
+        .item-title {
+          font-size: 1.1rem;
+        }
+        
+        .item-date {
+          font-size: 0.85rem;
+          align-self: flex-start;
+        }
+        
+        .item-description {
+          font-size: 0.9rem;
+          line-height: 1.5;
+        }
+        
+        .profile-text {
+          padding: 1rem;
+          font-size: 0.95rem;
+          line-height: 1.6;
+        }
+        
+        .section h2 {
+          font-size: 1.8rem;
+          margin-bottom: 1rem;
+        }
+        
+        .stats-grid {
+          grid-template-columns: 1fr;
+          gap: 0.75rem;
+        }
+      }
+      
+      @media (max-width: 480px) {
+        .hero-image {
+          height: 200px;
+        }
+        
+        .hero-content h1 {
+          font-size: 1.8rem;
+        }
+        
+        .hero-info {
+          padding: 0.4rem 0.75rem;
+        }
+        
+        .hero-info .subtitle {
+          font-size: 1rem;
+        }
+        
+        .hero-contact-info {
+          font-size: 0.85rem;
+        }
+        
+        .about-container {
+          padding: 0.3rem;
+        }
+        
+        .section-nav {
+          flex-wrap: wrap;
+          justify-content: center;
+          gap: 0.3rem;
+        }
+        
+        .nav-button {
+          padding: 0.4rem 0.6rem;
+          font-size: 0.75rem;
+          flex: 1;
+          min-width: calc(50% - 0.15rem);
+        }
+        
+        .experience-item,
+        .education-item,
+        .activity-item {
+          padding: 0.75rem;
+        }
+        
+        .item-title {
+          font-size: 1rem;
+        }
+        
+        .item-date {
+          font-size: 0.8rem;
+        }
+        
+        .item-description {
+          font-size: 0.85rem;
+        }
+        
+        .profile-text {
+          padding: 0.75rem;
+          font-size: 0.9rem;
+        }
+        
+        .section h2 {
+          font-size: 1.5rem;
+        }
       }
     </style>
   </head>

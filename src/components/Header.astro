@@ -203,6 +203,63 @@ html.dark .menu-toggle svg path {
   stroke: #fff !important;
 }
 
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  nav {
+    padding: 1rem;
+  }
+  
+  .site-title a {
+    font-size: 1.1rem;
+  }
+  
+  .menu-toggle {
+    padding: 0.5rem;
+  }
+  
+  .settings-toggle {
+    padding: 0.5rem;
+    margin-left: 0.25rem;
+  }
+  
+  .menu-bar {
+    width: 280px;
+    padding: 1.5rem 1rem;
+    gap: 1rem;
+  }
+  
+  .menu-bar a {
+    font-size: 1.1rem;
+    padding: 0.75rem 0;
+  }
+}
+
+@media (max-width: 480px) {
+  nav {
+    padding: 0.75rem;
+  }
+  
+  .site-title a {
+    font-size: 1rem;
+  }
+  
+  .menu-toggle,
+  .settings-toggle {
+    padding: 0.25rem;
+  }
+  
+  .menu-bar {
+    width: 100vw;
+    right: -100vw;
+    padding: 1rem;
+  }
+  
+  .menu-bar a {
+    font-size: 1rem;
+    padding: 0.5rem 0;
+  }
+}
+
 html.dark .settings-toggle svg path,
 html.dark .settings-toggle svg line,
 html.dark .settings-toggle svg circle {

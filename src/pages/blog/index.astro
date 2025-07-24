@@ -209,23 +209,72 @@ const posts = (await getCollection('blog')).sort(
 				box-shadow: var(--box-shadow);
 			}
 			
-			@media (max-width: 720px) {
-				ul {
-					gap: 0.5em;
+			@media (max-width: 768px) {
+				main {
+					width: 100%;
+					max-width: calc(100% - 1rem);
+					padding: 1rem 0.5rem;
 				}
+				
+				ul {
+					gap: 1rem;
+				}
+				
 				ul li {
 					width: 100%;
+					text-align: left;
+				}
+				
+				ul li:first-child {
+					margin-bottom: 1rem;
 					text-align: center;
 				}
-				ul li:first-child {
-					margin-bottom: 0;
-				}
+				
 				ul li:first-child .title {
-					font-size: 1.563em;
+					font-size: 1.8rem;
+				}
+				
+				ul li a {
+					padding: 1rem;
+				}
+				
+				.title {
+					font-size: 1.2rem;
+					line-height: 1.3;
+				}
+				
+				.date {
+					font-size: 0.9rem;
 				}
 				
 				ul li:hover {
-					transform: translateY(-4px) scale(1.01);
+					transform: translateY(-2px) scale(1.005);
+				}
+			}
+			
+			@media (max-width: 480px) {
+				main {
+					padding: 0.5rem 0.25rem;
+				}
+				
+				ul {
+					gap: 0.75rem;
+				}
+				
+				ul li a {
+					padding: 0.75rem;
+				}
+				
+				ul li:first-child .title {
+					font-size: 1.5rem;
+				}
+				
+				.title {
+					font-size: 1.1rem;
+				}
+				
+				.date {
+					font-size: 0.85rem;
 				}
 			}
 			

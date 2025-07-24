@@ -87,6 +87,21 @@ const posts = (await getCollection('blog')).sort(
         0% { left: -100%; }
         100% { left: 100%; }
       }
+      
+      .cursor {
+        animation: blink 1s infinite;
+        color: #333;
+      }
+      
+      html.dark .cursor {
+        color: #fff;
+      }
+      
+      @keyframes blink {
+        0%, 50% { opacity: 1; }
+        51%, 100% { opacity: 0; }
+      }
+      
       .author-bio p {
         color: #555;
         font-size: 1.3rem;
@@ -653,7 +668,7 @@ const posts = (await getCollection('blog')).sort(
       <section class="hero-section">
         <div class="author-bio">
           <img src="/profile.jpg" alt="Victor Lin" class="profile-pic" />
-          <h1>Victor Lin</h1>
+          <h1><span id="typewriter-text"></span><span class="cursor">|</span></h1>
           <p>
             Technology enthusiast, legal professional, and aspiring learner in the field of technology law.
           </p>
@@ -705,5 +720,55 @@ const posts = (await getCollection('blog')).sort(
         </section>
     </main>
     <Footer />
+    
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const text = "Victor Lin";
+        const typewriterElement = document.getElementById('typewriter-text');
+        
+        if (!typewriterElement) return;
+        
+        let index = 0;
+        let isDeleting = false;
+        let isPaused = false;
+        
+        function typeWriter() {
+          if (!typewriterElement) return;
+          
+          if (isPaused) {
+            setTimeout(typeWriter, 3000); // Pause at full text (longer)
+            isPaused = false;
+            return;
+          }
+          
+          if (!isDeleting) {
+            // Typing forward
+            typewriterElement.textContent = text.substring(0, index + 1);
+            index++;
+            
+            if (index === text.length) {
+              isPaused = true;
+              isDeleting = true;
+            }
+            
+            setTimeout(typeWriter, 100); // Typing speed
+          } else {
+            // Deleting backward
+            typewriterElement.textContent = text.substring(0, index);
+            index--;
+            
+            if (index === 0) {
+              isDeleting = false;
+              isPaused = true;
+            }
+            
+            setTimeout(typeWriter, 50); // Deleting speed (faster)
+          }
+        }
+        
+        // Start the typewriter effect
+        typeWriter();
+      });
+    </script>
   </body>
 </html>

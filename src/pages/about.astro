@@ -747,6 +747,19 @@ import { SITE_TITLE } from '../consts';
           border-left: none;
         }
       }
+      
+      /* Also remove left borders on tablet-sized mobile devices */
+      @media (max-width: 768px) {
+        html.dark .profile-text {
+          border-left: none;
+        }
+        
+        html.dark .experience-item,
+        html.dark .education-item,
+        html.dark .activity-item {
+          border-left: none;
+        }
+      }
     </style>
   </head>
   <body>

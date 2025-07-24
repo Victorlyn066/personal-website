@@ -37,13 +37,21 @@
   function checkDisclaimerStatus() {
     const dismissed = localStorage.getItem('legal-disclaimer-dismissed');
     const isAuthenticated = localStorage.getItem('website-authenticated') === 'true';
+    const hasPasswordProtection = document.getElementById('password-overlay') !== null;
     const overlay = document.getElementById('legal-disclaimer-overlay');
     
     if (!overlay) return;
     
-    // Only show disclaimer if user is authenticated and hasn't dismissed it
-    if (!isAuthenticated || dismissed === 'true') {
-      // Keep it hidden if not authenticated or dismissed
+    // If password protection exists and user is not authenticated, hide disclaimer
+    if (hasPasswordProtection && !isAuthenticated) {
+      overlay.style.display = 'none';
+      overlay.style.visibility = 'hidden';
+      return;
+    }
+    
+    // Show disclaimer if not dismissed (regardless of authentication when no password protection)
+    if (dismissed === 'true') {
+      // Keep it hidden if dismissed
       overlay.style.display = 'none';
       overlay.style.visibility = 'hidden';
     } else {

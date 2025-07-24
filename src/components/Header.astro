@@ -10,15 +10,17 @@ import ProfileImage from '../assets/profile.jpg';
     <div class="site-title">
       <a href="/">{SITE_TITLE}</a>
     </div>
-    <button class="menu-toggle" id="menu-toggle" aria-label="Open menu">
-      <svg width="28" height="28" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18" stroke="#222" stroke-width="2" stroke-linecap="round"/></svg>
-    </button>
-    <button class="settings-toggle" id="settings-toggle" aria-label="Toggle dark mode">
-      <span id="theme-icon">
-        <svg id="sun-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-        <svg id="moon-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg>
-      </span>
-    </button>
+    <div class="header-controls">
+      <button class="settings-toggle" id="settings-toggle" aria-label="Toggle dark mode">
+        <span id="theme-icon">
+          <svg id="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg id="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg>
+        </span>
+      </button>
+      <button class="menu-toggle" id="menu-toggle" aria-label="Open menu">
+        <svg width="24" height="24" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18" stroke="#222" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
     <div class="menu-bar" id="menu-bar">
       <HeaderLink href="/">Home</HeaderLink>
       <HeaderLink href="/about">About</HeaderLink>
@@ -82,39 +84,86 @@ header {
   background: #fff;
   border-bottom: 1px solid #eee;
   padding: 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
+
+html.dark header {
+  background: #18181b !important;
+  border-bottom: 1px solid #333 !important;
+}
+
 nav {
   max-width: 900px;
   margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1.5rem 1rem 1.5rem 1rem;
+  padding: 1rem;
   position: relative;
+  min-height: 60px;
 }
+.site-title {
+  flex: 1;
+}
+
 .site-title a {
   font-size: 1.3rem;
   font-weight: bold;
   color: #222;
   text-decoration: none;
   letter-spacing: 0.5px;
+  transition: color 0.3s ease;
 }
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .menu-toggle {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: none;
   border: none;
   cursor: pointer;
-  margin-left: auto;
   z-index: 1100;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
 }
+
+.menu-toggle:hover {
+  background: rgba(0,0,0,0.05);
+}
+
+html.dark .menu-toggle:hover {
+  background: rgba(255,255,255,0.1);
+}
+
 .settings-toggle {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: none;
   border: none;
   cursor: pointer;
-  margin-left: 0.5rem;
   z-index: 1100;
-  padding: 0.25rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.settings-toggle:hover {
+  background: rgba(0,0,0,0.05);
+}
+
+html.dark .settings-toggle:hover {
+  background: rgba(255,255,255,0.1);
 }
 .settings-toggle svg {
   vertical-align: middle;
@@ -206,20 +255,20 @@ html.dark .menu-toggle svg path {
 /* Mobile Responsive Styles */
 @media (max-width: 768px) {
   nav {
-    padding: 1rem;
+    padding: 0.75rem 1rem;
   }
   
   .site-title a {
     font-size: 1.1rem;
   }
   
-  .menu-toggle {
-    padding: 0.5rem;
+  .header-controls {
+    gap: 0.25rem;
   }
   
+  .menu-toggle,
   .settings-toggle {
-    padding: 0.5rem;
-    margin-left: 0.25rem;
+    padding: 0.4rem;
   }
   
   .menu-bar {
@@ -236,16 +285,20 @@ html.dark .menu-toggle svg path {
 
 @media (max-width: 480px) {
   nav {
-    padding: 0.75rem;
+    padding: 0.5rem 0.75rem;
   }
   
   .site-title a {
     font-size: 1rem;
   }
   
+  .header-controls {
+    gap: 0.125rem;
+  }
+  
   .menu-toggle,
   .settings-toggle {
-    padding: 0.25rem;
+    padding: 0.3rem;
   }
   
   .menu-bar {

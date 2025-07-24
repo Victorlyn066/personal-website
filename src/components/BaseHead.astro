@@ -4,6 +4,7 @@
 import '../styles/global.css';
 import { SITE_TITLE } from '../consts';
 import LegalDisclaimer from './LegalDisclaimer.astro';
+import PasswordProtection from './PasswordProtection.astro';
 import type { ImageMetadata } from 'astro';
 
 interface Props {
@@ -76,3 +77,6 @@ const imageUrl = typeof image === 'string' ? image : (image as ImageMetadata).sr
 
 <!-- Legal Disclaimer Popup -->
 <LegalDisclaimer />
+
+<!-- Password Protection -->
+<PasswordProtection />

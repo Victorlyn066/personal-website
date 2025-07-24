@@ -534,6 +534,35 @@ import { SITE_TITLE } from '../consts';
          color: #fff !important;
        }
        
+       html.dark .stat-item {
+         background: #1a1a1a !important;
+         border: 1px solid #333 !important;
+       }
+       
+       html.dark .stat-number {
+         color: #fff !important;
+       }
+       
+       html.dark .stat-label {
+         color: #ccc !important;
+       }
+       
+       html.dark .nav-button {
+         background: #1a1a1a !important;
+         border: 1px solid #333 !important;
+         color: #fff !important;
+       }
+       
+       html.dark .nav-button:hover {
+         background: #333 !important;
+         border-color: #555 !important;
+       }
+       
+       html.dark .nav-button.active {
+         background: #333 !important;
+         border-color: #fff !important;
+       }
+       
        html.dark .profile-text {
          background: #1a1a1a !important;
          color: #ddd !important;
@@ -584,6 +613,9 @@ import { SITE_TITLE } from '../consts';
       @media (max-width: 480px) {
         .hero-image {
           height: 180px;
+          width: 100vw;
+          margin-left: calc(-50vw + 50%);
+          margin-right: calc(-50vw + 50%);
         }
         
         .hero-content h1 {
@@ -617,11 +649,18 @@ import { SITE_TITLE } from '../consts';
         }
         
         .nav-button {
-          padding: 0.6rem 0.8rem;
-          font-size: 0.85rem;
+          padding: 0.5rem 0.3rem;
+          font-size: 0.7rem;
           flex: 1;
           min-width: calc(50% - 0.25rem);
           max-width: calc(50% - 0.25rem);
+          white-space: normal;
+          word-wrap: break-word;
+          text-align: center;
+          line-height: 1.1;
+          overflow-wrap: break-word;
+          height: auto;
+          min-height: 2.5rem;
         }
         
         .experience-item,
@@ -683,6 +722,9 @@ import { SITE_TITLE } from '../consts';
       @media (max-width: 768px) {
         .hero-image {
           height: 220px;
+          width: 100vw;
+          margin-left: calc(-50vw + 50%);
+          margin-right: calc(-50vw + 50%);
         }
         
         .hero-content h1 {
@@ -717,11 +759,16 @@ import { SITE_TITLE } from '../consts';
         }
         
         .nav-button {
-          padding: 0.7rem 1rem;
-          font-size: 0.9rem;
+          padding: 0.6rem 0.4rem;
+          font-size: 0.75rem;
           flex: 1;
           max-width: calc(50% - 0.375rem);
           min-width: auto;
+          white-space: normal;
+          word-wrap: break-word;
+          text-align: center;
+          line-height: 1.2;
+          overflow-wrap: break-word;
         }
         
         .experience-item,

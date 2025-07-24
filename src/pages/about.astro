@@ -611,11 +611,20 @@ import { SITE_TITLE } from '../consts';
       /* Mobile Responsive Styles - Consolidated */
       
       @media (max-width: 480px) {
+        body {
+          overflow-x: hidden;
+        }
+        
         .hero-image {
           height: 180px;
+          position: relative;
+          left: 50%;
+          right: 50%;
+          margin-left: -50vw;
+          margin-right: -50vw;
           width: 100vw;
-          margin-left: calc(-50vw + 50%);
-          margin-right: calc(-50vw + 50%);
+          max-width: none;
+          box-sizing: border-box;
         }
         
         .hero-content h1 {
@@ -720,11 +729,20 @@ import { SITE_TITLE } from '../consts';
       
       /* Also remove left borders on tablet-sized mobile devices */
       @media (max-width: 768px) {
+        body {
+          overflow-x: hidden;
+        }
+        
         .hero-image {
           height: 220px;
+          position: relative;
+          left: 50%;
+          right: 50%;
+          margin-left: -50vw;
+          margin-right: -50vw;
           width: 100vw;
-          margin-left: calc(-50vw + 50%);
-          margin-right: calc(-50vw + 50%);
+          max-width: none;
+          box-sizing: border-box;
         }
         
         .hero-content h1 {

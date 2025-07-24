@@ -2,7 +2,7 @@
 // LegalDisclaimer.astro - Site-wide legal disclaimer popup
 ---
 
-<div id="legal-disclaimer-overlay" class="disclaimer-overlay">
+<div id="legal-disclaimer-overlay" class="disclaimer-overlay" style="display: none; visibility: hidden;">
   <div class="disclaimer-popup">
     <button id="close-disclaimer" class="close-btn" aria-label="Close disclaimer">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -41,8 +41,12 @@
     if (!overlay) return;
     
     if (dismissed === 'true') {
+      // Keep it hidden if dismissed
       overlay.style.display = 'none';
+      overlay.style.visibility = 'hidden';
     } else {
+      // Remove inline styles and show properly
+      overlay.style.visibility = 'visible';
       overlay.style.display = 'flex';
       // Add fade-in animation
       setTimeout(() => {
@@ -123,6 +127,7 @@
     background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(4px);
     display: none;
+    visibility: hidden;
     justify-content: center;
     align-items: center;
     z-index: 10000;
@@ -186,6 +191,12 @@
   .disclaimer-content {
     padding: 2rem;
     text-align: center;
+  }
+  
+  /* Prevent flash of unstyled content */
+  .disclaimer-overlay:not(.show) .disclaimer-content {
+    opacity: 0;
+    visibility: hidden;
   }
 
   .disclaimer-icon {

@@ -4,11 +4,16 @@ import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
+import AuthorBio from '../components/AuthorBio.astro';
+import LikeButton from '../components/LikeButton.astro';
 import { Image } from 'astro:assets';
 
 type Props = CollectionEntry<'blog'>['data'];
 
 const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+
+// Generate a unique post ID from the URL
+const postId = Astro.url.pathname.replace(/^\/blog\//, '').replace(/\/$/, '');
 ---
 
 <html lang="en">
@@ -52,6 +57,18 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 			.last-updated-on {
 				font-style: italic;
 			}
+			.post-actions {
+				margin: 2rem 0;
+				padding: 1rem 0;
+				border-top: 1px solid #e1e5e9;
+				border-bottom: 1px solid #e1e5e9;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+			html.dark .post-actions {
+				border-color: #333;
+			}
 		</style>
 	</head>
 
@@ -78,6 +95,10 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 						<hr />
 					</div>
 					<slot />
+					<div class="post-actions">
+						<LikeButton postId={postId} size="large" />
+					</div>
+					<AuthorBio />
 				</div>
 			</article>
 		</main>

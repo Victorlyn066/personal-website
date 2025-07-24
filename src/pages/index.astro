@@ -3,47 +3,581 @@ import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+import { getCollection } from 'astro:content';
+import FormattedDate from '../components/FormattedDate.astro';
+import LikeButton from '../components/LikeButton.astro';
+import ProfileImage from '../assets/profile.jpg';
+
+const posts = (await getCollection('blog')).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+).slice(0, 5); // Show latest 5 posts
 ---
 
 <!doctype html>
 <html lang="en">
-	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-	</head>
-	<body>
-		<Header />
-		<main>
-			<h1>🧑‍🚀 Hello, Astronaut!</h1>
-			<p>
-				Welcome to the official <a href="https://astro.build/">Astro</a> blog starter template. This
-				template serves as a lightweight, minimally-styled starting point for anyone looking to build
-				a personal website, blog, or portfolio with Astro.
-			</p>
-			<p>
-				This template comes with a few integrations already configured in your
-				<code>astro.config.mjs</code> file. You can customize your setup with
-				<a href="https://astro.build/integrations">Astro Integrations</a> to add tools like Tailwind,
-				React, or Vue to your project.
-			</p>
-			<p>Here are a few ideas on how to get started with the template:</p>
-			<ul>
-				<li>Edit this page in <code>src/pages/index.astro</code></li>
-				<li>Edit the site header items in <code>src/components/Header.astro</code></li>
-				<li>Add your name to the footer in <code>src/components/Footer.astro</code></li>
-				<li>Check out the included blog posts in <code>src/content/blog/</code></li>
-				<li>Customize the blog post page layout in <code>src/layouts/BlogPost.astro</code></li>
-			</ul>
-			<p>
-				Have fun! If you get stuck, remember to
-				<a href="https://docs.astro.build/">read the docs</a>
-				or <a href="https://astro.build/chat">join us on Discord</a> to ask questions.
-			</p>
-			<p>
-				Looking for a blog template with a bit more personality? Check out
-				<a href="https://github.com/Charca/astro-blog-template">astro-blog-template</a>
-				by <a href="https://twitter.com/Charca">Maxi Ferreira</a>.
-			</p>
-		</main>
-		<Footer />
-	</body>
+  <head>
+    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+    <style>
+      /* Hero Section with White Background */
+      .hero-section {
+        background: white;
+        padding: 4rem 0 3rem 0;
+        position: relative;
+        overflow: hidden;
+        transition: background-color 0.3s ease;
+      }
+      
+      /* Dark Mode Styles */
+      html.dark .hero-section {
+        background: #18181b !important;
+        background-color: #18181b !important;
+      }
+      
+      html.dark .hero-section p,
+      html.dark .hero-section span,
+      html.dark .hero-section .author-bio p {
+        color: #fff !important;
+      }
+      .author-bio {
+        margin: 0;
+        text-align: center;
+        position: relative;
+        z-index: 2;
+        animation: fadeInUp 1s ease-out;
+      }
+      .author-bio h1 {
+        margin-bottom: 0.8rem;
+        font-size: 3rem;
+        font-weight: 800;
+        background: linear-gradient(45deg, #333 0%, #666 50%, #333 100%);
+        background-size: 200% 200%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        letter-spacing: -1px;
+        text-shadow: none;
+        animation: gradientShift 3s ease-in-out infinite, scaleIn 0.8s ease-out;
+        position: relative;
+        overflow: hidden;
+        transition: background 0.3s ease;
+      }
+      
+      html.dark .author-bio h1 {
+        background: #fff;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: none !important;
+      }
+      
+      html.dark .author-bio h1::after {
+        display: none !important;
+      }
+      .author-bio h1::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        animation: shine 2s infinite;
+      }
+      @keyframes shine {
+        0% { left: -100%; }
+        100% { left: 100%; }
+      }
+      .author-bio p {
+        color: #555;
+        font-size: 1.3rem;
+        margin: 0 auto 2rem auto;
+        max-width: 600px;
+        font-weight: 400;
+        line-height: 1.6;
+        animation: fadeInUp 1s ease-out 0.3s both;
+        transition: color 0.3s ease;
+      }
+      
+      html.dark .author-bio p {
+        color: #18181b;
+      }
+      
+      /* Advanced Animations */
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+      }
+      @keyframes slideInLeft {
+        from {
+          opacity: 0;
+          transform: translateX(-50px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+      @keyframes slideInRight {
+        from {
+          opacity: 0;
+          transform: translateX(50px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+      @keyframes scaleIn {
+        from {
+          opacity: 0;
+          transform: scale(0.8);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+      }
+      @keyframes gradientShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
+      @keyframes typewriter {
+        from { width: 0; }
+        to { width: 100%; }
+      }
+      @keyframes blink {
+        0%, 50% { opacity: 1; }
+        51%, 100% { opacity: 0; }
+      }
+      .post-list {
+        list-style: none;
+        padding: 0;
+        margin: 0 auto;
+        max-width: 700px;
+      }
+      .post-list li {
+        margin-bottom: 2.5rem;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 1.5rem;
+      }
+      .post-list a {
+        text-decoration: none;
+      }
+      .post-title {
+        font-size: 1.4rem;
+        margin: 0 0 0.2rem 0;
+        color: var(--text);
+      }
+      .post-date {
+        color: var(--gray);
+        font-size: 0.95rem;
+        margin-bottom: 0.5rem;
+      }
+      .post-excerpt {
+        color: var(--text);
+        font-size: 1.05rem;
+      }
+      .profile-pic {
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        border: 4px solid white;
+        transition: all 0.3s ease;
+        animation: float 6s ease-in-out infinite;
+      }
+      .profile-pic:hover {
+        transform: scale(1.05);
+        box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+      }
+      /* Social Links Enhancement */
+      .social-links {
+        display: flex;
+        justify-content: center;
+        gap: 1.5rem;
+        margin: 2rem 0 0 0;
+        animation: fadeInUp 1s ease-out 0.6s both;
+      }
+      .social-links a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        background: white;
+        color: #666;
+        transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        text-decoration: none;
+        animation: scaleIn 0.6s ease-out calc(0.8s + var(--delay)) forwards;
+        opacity: 1;
+      }
+      
+      html.dark .social-links a {
+        background: #333;
+        color: #fff;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        border: 1px solid #444;
+      }
+      .social-links a:nth-child(1) { --delay: 0s; }
+      .social-links a:nth-child(2) { --delay: 0.1s; }
+      .social-links a:nth-child(3) { --delay: 0.2s; }
+      .social-links a:hover {
+        transform: translateY(-3px) rotate(5deg);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        color: #333;
+        background: #f8f9fa;
+      }
+      
+      html.dark .social-links a:hover {
+        color: #fff;
+        background: #555;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+        border: 1px solid #666;
+      }
+      
+      /* Welcome Section */
+      .welcome-section {
+        background: white;
+        padding: 1rem 0 3rem 0;
+        margin-top: 0;
+        position: relative;
+        z-index: 3;
+        transition: background-color 0.3s ease;
+      }
+      
+      html.dark .welcome-section {
+        background: #18181b !important;
+        background-color: #18181b !important;
+      }
+      
+      html.dark .welcome-section p,
+      html.dark .welcome-section span,
+      html.dark .welcome-section .bio-left {
+        color: #fff !important;
+      }
+      
+      /* Force dark mode on all sections */
+      html.dark section {
+        background: #18181b !important;
+        background-color: #18181b !important;
+      }
+      
+      html.dark section p,
+      html.dark section span:not(.post-day):not(.post-month-year) {
+        color: #fff !important;
+      }
+      .bio-left {
+        text-align: center;
+        max-width: 800px;
+        font-size: 1.2rem;
+        margin: 0 auto;
+        line-height: 1.7;
+        color: #444;
+        font-weight: 400;
+        animation: slideInLeft 1s ease-out 0.9s both;
+        transition: color 0.3s ease;
+      }
+      
+      html.dark .bio-left {
+        color: #18181b;
+      }
+      .bio-left br {
+        margin-bottom: 1rem;
+      }
+      /* Blog Section Enhancement */
+      .latest-posts {
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        color: #222;
+        padding: 4rem 0 0.2rem 0;
+        margin-top: 0;
+        margin-bottom: 0;
+        position: relative;
+        transition: all 0.3s ease;
+      }
+      
+      html.dark .latest-posts {
+        background: linear-gradient(135deg, #111 0%, #000 100%);
+        color: #fff;
+      }
+      .latest-posts::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #ddd, transparent);
+      }
+      .latest-posts-inner {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 0 2rem;
+      }
+      .latest-posts h2 {
+        font-size: 2.5rem;
+        letter-spacing: -1px;
+        font-weight: 800;
+        margin: 0 0 1rem 0;
+        color: #222;
+        text-align: center;
+        position: relative;
+        animation: slideInRight 1s ease-out 1.2s both;
+        transition: color 0.3s ease;
+      }
+      
+      html.dark .latest-posts h2 {
+        background: linear-gradient(45deg, #fff 0%, #e0e0e0 50%, #fff 100%);
+        background-size: 200% 200%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: gradientShift 3s ease-in-out infinite, slideInRight 1s ease-out 1.2s both;
+      }
+      .latest-posts h2::after {
+        content: '';
+        position: absolute;
+        bottom: -0.5rem;
+        left: 50%;
+        transform: translateX(-50%) scaleX(0);
+        width: 80px;
+        height: 3px;
+        background: linear-gradient(90deg, #333, #666);
+        border-radius: 2px;
+        animation: scaleInX 0.8s ease-out 1.5s both;
+        transform-origin: center;
+        transition: background 0.3s ease;
+      }
+      
+      html.dark .latest-posts h2::after {
+        background: linear-gradient(90deg, #fff, #e0e0e0);
+      }
+      @keyframes scaleInX {
+        from { transform: translateX(-50%) scaleX(0); }
+        to { transform: translateX(-50%) scaleX(1); }
+      }
+      .latest-posts hr {
+        display: none;
+      }
+      .latest-list {
+        list-style: none;
+        margin: 2rem 0 0.3rem 0;
+        padding: 0;
+        display: grid;
+        gap: 2rem;
+      }
+      .post-row {
+        display: flex;
+        align-items: flex-start;
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        gap: 2rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        border: 1px solid #f0f0f0;
+        animation: fadeInUp 0.8s ease-out calc(1.8s + var(--post-delay)) both;
+        opacity: 0;
+      }
+      
+      html.dark .post-row {
+        background: #1a1a1a;
+        border: 1px solid #333;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      }
+      .post-row:nth-child(1) { --post-delay: 0s; }
+      .post-row:nth-child(2) { --post-delay: 0.2s; }
+      .post-row:nth-child(3) { --post-delay: 0.4s; }
+      .post-row:nth-child(4) { --post-delay: 0.6s; }
+      .post-row:nth-child(5) { --post-delay: 0.8s; }
+      .post-row:hover {
+        transform: translateY(-4px) scale(1.02);
+        box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+      }
+      
+      html.dark .post-row:hover {
+        box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+      }
+      .post-date {
+        min-width: 100px;
+        text-align: center;
+        margin-right: 1.5em;
+        font-family: 'Atkinson', sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        flex-shrink: 0;
+      }
+      .post-day {
+        font-size: 3.5em;
+        font-weight: 800;
+        line-height: 0.9;
+        letter-spacing: -2px;
+        color: #222;
+        margin-bottom: 0.1em;
+        transition: color 0.3s ease;
+      }
+      .post-month-year {
+        font-size: 1.1em;
+        color: #666;
+        line-height: 1;
+        margin: 0;
+        padding: 0;
+        font-weight: 500;
+        text-align: center;
+        transition: color 0.3s ease;
+      }
+      
+      html.dark .post-day {
+        color: #fff;
+      }
+      
+      html.dark .post-month-year {
+        color: #bbb;
+      }
+      .post-content {
+        flex: 1;
+        padding-top: 0.2em;
+      }
+      .post-title {
+        color: #222;
+        font-size: 1.4em;
+        font-weight: 700;
+        text-decoration: none;
+        margin-bottom: 0.3em;
+        display: block;
+        line-height: 1.2;
+        transition: all 0.3s ease;
+      }
+      .post-title:hover {
+        color: #333;
+        transform: translateX(8px);
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+      .post-desc {
+        color: #666;
+        font-size: 1.05em;
+        margin-top: 0.2em;
+        font-weight: 400;
+        line-height: 1.4;
+        transition: color 0.3s ease;
+      }
+      
+      html.dark .post-title {
+        color: #fff;
+      }
+      
+      html.dark .post-title:hover {
+        color: #ddd;
+        text-shadow: 0 2px 4px rgba(255,255,255,0.2);
+      }
+      
+      html.dark .post-desc {
+        color: #aaa;
+      }
+      
+      .post-meta {
+        margin-top: 0.75rem;
+        padding-top: 0.5rem;
+        border-top: 1px solid #f0f0f0;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+      }
+      
+      html.dark .post-meta {
+        border-top-color: #333;
+      }
+      @media (max-width: 700px) {
+        .post-row {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 0.5em;
+        }
+        .post-date {
+          text-align: left;
+          align-items: flex-start;
+          margin-bottom: 0.5em;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <Header />
+    <main>
+      <section class="hero-section">
+        <div class="author-bio">
+          <img src="/profile.jpg" alt="Victor Lin" class="profile-pic" />
+          <h1>Victor Lin</h1>
+          <p>
+            Technology enthusiast, legal professional, and aspiring learner in the field of technology law.
+          </p>
+          <div class="social-links">
+            <a href="https://www.linkedin.com/in/victor-lin-a36407269/" target="_blank" aria-label="LinkedIn">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 8a6 6 0 0 1 6 6v6h-4v-6a2 2 0 0 0-4 0v6h-4v-6a6 6 0 0 1 6-6z"/><circle cx="8" cy="8" r="2"/></svg>
+            </a>
+            <a href="mailto:victorlyn066@gmail.com" aria-label="Email">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </a>
+            <a href="https://github.com/YOUR-GITHUB" target="_blank" aria-label="GitHub">
+              <svg width="24" height="24" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+            </a>
+          </div>
+        </div>
+      </section>
+      
+      <section class="welcome-section">
+        <p class="bio-left">
+          I am a current 4th year law and computer science student at The University of Sydney with more than 3-4 years of professional experience in law, technology, and leadership.<br/><br/>
+          Welcome to my personal blog where I share my thoughts on software, tech, and law!
+		  (<strong>Disclaimer<strong>: This is a personal blog and nothing on this website constitutes legal advice.)
+        </p>
+      </section>
+      <section class="latest-posts">
+          <div class="latest-posts-inner">
+            <h2>LATEST POSTS</h2>
+            <hr />
+            <ul class="latest-list">
+              {
+                posts.map((post) => (
+                  <li class="post-row">
+                    <div class="post-date">
+                      <span class="post-day">{post.data.pubDate.getDate().toString().padStart(2, '0')}</span>
+                      <span class="post-month-year">{post.data.pubDate.toLocaleString('default', { month: 'short' })} {post.data.pubDate.getFullYear()}</span>
+                    </div>
+                    <div class="post-content">
+                      <a href={`/blog/${post.id}/`} class="post-title">{post.data.title}</a>
+                      <div class="post-desc">{post.data.description || ''}</div>
+                      <div class="post-meta">
+                        <LikeButton postId={post.id} size="small" />
+                      </div>
+                    </div>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+        </section>
+    </main>
+    <Footer />
+  </body>
 </html>

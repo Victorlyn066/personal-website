@@ -1,0 +1,330 @@
+---
+// LegalDisclaimer.astro - Site-wide legal disclaimer popup
+---
+
+<div id="legal-disclaimer-overlay" class="disclaimer-overlay">
+  <div class="disclaimer-popup">
+    <button id="close-disclaimer" class="close-btn" aria-label="Close disclaimer">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"/>
+        <line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+    <div class="disclaimer-content">
+      <div class="disclaimer-icon">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+      </div>
+      <h3>Legal Disclaimer</h3>
+      <p>
+        The following information is <strong>not legal advice</strong>, simply my personal thoughts and ideas. 
+        Content on this website is for informational purposes only and should not be construed otherwise.
+      </p>
+      <div class="disclaimer-actions">
+        <button id="dismiss-disclaimer" class="dismiss-btn">
+          I Confirm and Don't Show Again
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Check if disclaimer has been dismissed
+  function checkDisclaimerStatus() {
+    const dismissed = localStorage.getItem('legal-disclaimer-dismissed');
+    const overlay = document.getElementById('legal-disclaimer-overlay');
+    
+    if (!overlay) return;
+    
+    if (dismissed === 'true') {
+      overlay.style.display = 'none';
+    } else {
+      overlay.style.display = 'flex';
+      // Add fade-in animation
+      setTimeout(() => {
+        overlay.classList.add('show');
+      }, 100);
+    }
+  }
+
+  // Dismiss disclaimer permanently and save to localStorage
+  function dismissDisclaimer() {
+    const overlay = document.getElementById('legal-disclaimer-overlay');
+    if (!overlay) return;
+    
+    overlay.classList.add('fade-out');
+    
+    setTimeout(() => {
+      overlay.style.display = 'none';
+      localStorage.setItem('legal-disclaimer-dismissed', 'true');
+    }, 300);
+  }
+
+  // Close disclaimer temporarily (will show again on next visit)
+  function closeDisclaimer() {
+    const overlay = document.getElementById('legal-disclaimer-overlay');
+    if (!overlay) return;
+    
+    overlay.classList.add('fade-out');
+    
+    setTimeout(() => {
+      overlay.style.display = 'none';
+      // Don't save to localStorage - will show again on next visit
+    }, 300);
+  }
+
+  // Initialize when DOM is loaded
+  document.addEventListener('DOMContentLoaded', function() {
+    checkDisclaimerStatus();
+    
+    const dismissBtn = document.getElementById('dismiss-disclaimer');
+    if (dismissBtn) {
+      dismissBtn.addEventListener('click', dismissDisclaimer);
+    }
+
+    const closeBtn = document.getElementById('close-disclaimer');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', closeDisclaimer);
+    }
+
+    // Close on overlay click (outside popup) - temporary close
+    const overlay = document.getElementById('legal-disclaimer-overlay');
+    if (overlay) {
+      overlay.addEventListener('click', function(e) {
+        if (e.target === overlay) {
+          closeDisclaimer();
+        }
+      });
+    }
+
+    // Close on Escape key - temporary close
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        const overlay = document.getElementById('legal-disclaimer-overlay');
+        if (overlay && overlay.style.display !== 'none') {
+          closeDisclaimer();
+        }
+      }
+    });
+  });
+</script>
+
+<style>
+  .disclaimer-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .disclaimer-overlay.show {
+    opacity: 1;
+  }
+
+  .disclaimer-overlay.fade-out {
+    opacity: 0;
+  }
+
+  .disclaimer-popup {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    transform: scale(0.9) translateY(20px);
+    transition: transform 0.3s ease;
+    border: 1px solid #e1e5e9;
+    position: relative;
+  }
+
+  .close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .close-btn:hover {
+    background: #f3f4f6;
+    color: #374151;
+    transform: scale(1.1);
+  }
+
+  .close-btn:active {
+    transform: scale(0.95);
+  }
+
+  .disclaimer-overlay.show .disclaimer-popup {
+    transform: scale(1) translateY(0);
+  }
+
+  .disclaimer-content {
+    padding: 2rem;
+    text-align: center;
+  }
+
+  .disclaimer-icon {
+    color: #f59e0b;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  .disclaimer-content h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 1rem 0;
+  }
+
+  .disclaimer-content p {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #4b5563;
+    margin: 0 0 2rem 0;
+    text-align: left;
+  }
+
+  .disclaimer-content strong {
+    color: #dc2626;
+    font-weight: 600;
+  }
+
+  .disclaimer-actions {
+    display: flex;
+    justify-content: center;
+  }
+
+  .dismiss-btn {
+    background: #1f2937;
+    color: white;
+    border: none;
+    padding: 0.75rem 2rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(31, 41, 55, 0.3);
+  }
+
+  .dismiss-btn:hover {
+    background: #374151;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(31, 41, 55, 0.4);
+  }
+
+  .dismiss-btn:active {
+    transform: translateY(0);
+  }
+
+  /* Dark mode support */
+  html.dark .disclaimer-popup {
+    background: #1f2937;
+    border: 1px solid #374151;
+  }
+
+  html.dark .disclaimer-content h3 {
+    color: #f9fafb;
+  }
+
+  html.dark .disclaimer-content p {
+    color: #d1d5db;
+  }
+
+  html.dark .disclaimer-content strong {
+    color: #fca5a5;
+  }
+
+  html.dark .disclaimer-icon {
+    color: #fbbf24;
+  }
+
+  html.dark .dismiss-btn {
+    background: #374151;
+    color: #f9fafb;
+  }
+
+  html.dark .dismiss-btn:hover {
+    background: #4b5563;
+  }
+
+  html.dark .close-btn {
+    color: #9ca3af;
+  }
+
+  html.dark .close-btn:hover {
+    background: #374151;
+    color: #d1d5db;
+  }
+
+  /* Mobile responsiveness */
+  @media (max-width: 640px) {
+    .disclaimer-popup {
+      margin: 1rem;
+      max-width: none;
+      width: calc(100% - 2rem);
+    }
+
+    .disclaimer-content {
+      padding: 1.5rem;
+    }
+
+    .disclaimer-content h3 {
+      font-size: 1.25rem;
+    }
+
+    .disclaimer-content p {
+      font-size: 0.95rem;
+    }
+
+    .dismiss-btn {
+      padding: 0.75rem 1.5rem;
+      font-size: 0.95rem;
+    }
+  }
+
+  /* Accessibility improvements */
+  .dismiss-btn:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+  }
+
+  .close-btn:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .disclaimer-overlay,
+    .disclaimer-popup,
+    .dismiss-btn {
+      transition: none;
+    }
+  }
+</style> 

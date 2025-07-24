@@ -1,0 +1,266 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title="Contact - Victor Lin" description="Get in touch with Victor Lin - Law and Computer Science student and aspiring technology lawyer." />
+    <style>
+      .hero-image {
+        width: 100%;
+        height: 300px;
+        background: linear-gradient(135deg, #333 0%, #000 100%);
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 0;
+      }
+      .hero-image::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.3);
+        z-index: 1;
+      }
+      .hero-content {
+        position: relative;
+        z-index: 2;
+        color: white;
+        text-align: center;
+        padding: 2em;
+      }
+      .hero-content h1 {
+        font-size: 2.5em;
+        margin-bottom: 0.5em;
+        color: white;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+      }
+      .hero-content p {
+        font-size: 1.1em;
+        color: rgba(255,255,255,0.9);
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+      }
+      .contact-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 3em 1em;
+        line-height: 1.6;
+      }
+      .contact-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3em;
+        margin-bottom: 3em;
+      }
+      .contact-info {
+        background: #f8f9fa;
+        padding: 2em;
+        border-radius: 8px;
+        border-left: 4px solid #000;
+      }
+      .contact-info h2 {
+        font-size: 1.5em;
+        color: #222;
+        margin-bottom: 1em;
+        padding-bottom: 0.3em;
+        border-bottom: 2px solid #000;
+      }
+      .contact-item {
+        margin-bottom: 1.5em;
+        display: flex;
+        align-items: center;
+        gap: 1em;
+      }
+      .contact-icon {
+        font-size: 1.2em;
+        width: 30px;
+        text-align: center;
+      }
+      .contact-details h3 {
+        margin: 0 0 0.3em 0;
+        color: #333;
+        font-size: 1em;
+      }
+      .contact-details p {
+        margin: 0;
+        color: #666;
+        font-size: 0.9em;
+      }
+      .contact-form {
+        background: white;
+        padding: 2em;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        border: 1px solid #eee;
+      }
+      .contact-form h2 {
+        font-size: 1.5em;
+        color: #222;
+        margin-bottom: 1em;
+        padding-bottom: 0.3em;
+        border-bottom: 2px solid #000;
+      }
+      .form-group {
+        margin-bottom: 1.5em;
+      }
+      .form-group label {
+        display: block;
+        margin-bottom: 0.5em;
+        color: #333;
+        font-weight: 600;
+      }
+      .form-group input,
+      .form-group textarea {
+        width: 100%;
+        padding: 0.8em;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 1em;
+        font-family: inherit;
+        transition: border-color 0.3s ease;
+      }
+      .form-group input:focus,
+      .form-group textarea:focus {
+        outline: none;
+        border-color: #000;
+      }
+      .form-group textarea {
+        resize: vertical;
+        min-height: 350px;
+      }
+      .submit-btn {
+        background: #333;
+        color: white;
+        padding: 0.8em 2em;
+        border: none;
+        border-radius: 4px;
+        font-size: 1em;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+      .submit-btn:hover {
+        background: #000;
+      }
+      .social-links {
+        text-align: center;
+        margin-top: 3em;
+        padding-top: 2em;
+        border-top: 1px solid #eee;
+      }
+      .social-links h3 {
+        margin-bottom: 1em;
+        color: #333;
+      }
+      .social-icons {
+        display: flex;
+        justify-content: center;
+        gap: 2em;
+      }
+      .social-icon {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5em;
+        color: #666;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s ease;
+      }
+      .social-icon:hover {
+        color: #000;
+      }
+      @media (max-width: 768px) {
+        .contact-grid {
+          grid-template-columns: 1fr;
+          gap: 2em;
+        }
+        .hero-content h1 {
+          font-size: 2em;
+        }
+        .social-icons {
+          flex-direction: column;
+          gap: 1em;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <Header />
+    <div class="hero-image">
+      <div class="hero-content">
+        <h1>Contact Me</h1>
+        <p>Let's connect and discuss opportunities in the field of technology and law!</p>
+      </div>
+    </div>
+    <main class="contact-container">
+      <div class="contact-grid">
+        <div class="contact-info">
+          <h2>Get In Touch</h2>
+          
+          <div class="contact-item">
+            <div class="contact-icon">📧</div>
+            <div class="contact-details">
+              <h3>Email</h3>
+              <p>victorlyn066@gmail.com</p>
+            </div>
+          </div>
+          
+          <div class="contact-item">
+            <div class="contact-icon">🌐</div>
+            <div class="contact-details">
+              <h3>Languages</h3>
+              <p>English & Mandarin</p>
+            </div>
+          </div>
+          
+          <div class="contact-item">
+            <div class="contact-icon">🎓</div>
+            <div class="contact-details">
+              <h3>Current Status</h3>
+              <p>Law & Computer Science Student @<br>The University of Sydney<br>Legal Professional and Software Developer</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="contact-form">
+          <h2>Send Message</h2>
+          <form action="#" method="POST">
+            <div class="form-group">
+              <label for="name">Name *</label>
+              <input type="text" id="name" name="name" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="email">Email *</label>
+              <input type="email" id="email" name="email" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="subject">Subject *</label>
+              <input type="text" id="subject" name="subject" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="message">Message *</label>
+              <textarea id="message" name="message" placeholder="Tell me about your project, opportunity, or how I can help..." required></textarea>
+            </div>
+            
+            <button type="submit" class="submit-btn">Send Message</button>
+          </form>
+        </div>
+      </div>
+      
+      <div class="social-links">
+        <h3>Connect With Me</h3>
+      </div>
+    </main>
+    <Footer />
+  </body>
+</html> 

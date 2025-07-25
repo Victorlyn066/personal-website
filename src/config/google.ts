@@ -9,10 +9,10 @@
 
 export const GOOGLE_CONFIG = {
   // Replace with your actual Google OAuth Client ID
-  CLIENT_ID: 'your-google-client-id-here.apps.googleusercontent.com',
+  CLIENT_ID: '175048817524-o1dvmrsjvskvtth2vdno9dn28h3fkpjr.apps.googleusercontent.com',
   
   // Set to true when you have configured your real Google Client ID
-  ENABLED: false,
+  ENABLED: true,
   
   // Authorized domains for production
   AUTHORIZED_DOMAINS: [

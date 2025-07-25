@@ -1216,6 +1216,10 @@ const { postSlug } = Astro.props;
         currentUser = user;
         localStorage.setItem('blog-user', JSON.stringify(currentUser));
         
+        // Clear any previous error states
+        const errorMessages = document.querySelectorAll('.error-message');
+        errorMessages.forEach(msg => msg.remove());
+        
         // Immediately show logged in state and comment form
         showLoggedInState();
         showCommentForm();
@@ -1225,6 +1229,14 @@ const { postSlug } = Astro.props;
         
         console.log('User logged in successfully:', user);
         console.log('Comment form should now be visible');
+        
+        // Ensure the Google sign-in widget is hidden after successful login
+        setTimeout(() => {
+          const googleContainer = document.getElementById('google-signin-container');
+          if (googleContainer) {
+            googleContainer.style.display = 'none';
+          }
+        }, 500);
         
         console.log('Google Sign-In successful:', user);
         console.log('Profile picture URL:', payload.picture);
@@ -1565,10 +1577,28 @@ const { postSlug } = Astro.props;
     }
     
     function showLoggedOutState() {
-      if (loginSection) loginSection.style.display = 'block';
+      console.log('Showing logged out state');
+      
+      if (loginSection) {
+        loginSection.style.display = 'block';
+        console.log('Login section shown');
+      }
       if (registerSection) registerSection.style.display = 'none';
-      if (userSection) userSection.style.display = 'none';
+      if (userSection) {
+        userSection.style.display = 'none';
+        console.log('User section hidden');
+      }
       if (addCommentBtn) addCommentBtn.style.display = 'none';
+      
+      // Show Google sign-in container
+      const googleContainer = document.getElementById('google-signin-container');
+      if (googleContainer) {
+        googleContainer.style.display = 'flex';
+        console.log('Google sign-in container shown');
+      }
+      
+      // Reload comments to hide reply buttons
+      loadComments();
     }
     
     function showCommentForm() {
@@ -1702,22 +1732,54 @@ const { postSlug } = Astro.props;
     function handleLogout() {
       console.log('Logging out user...');
       
+      // Store user email for Google revoke
+      const userEmail = currentUser?.email;
+      
       // Clear current user state
       currentUser = null;
       localStorage.removeItem('blog-user');
       
-      // Clear any Google-related cookies
-      document.cookie = 'g_state=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=' + window.location.hostname;
-      document.cookie = 'g_state=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.' + window.location.hostname;
+      // Clear all possible Google cookies and storage
+      const cookiesToClear = [
+        'g_state', 'g_csrf_token', '__Host-1PLSID', '__Host-3PLSID', 
+        'SSID', 'APISID', 'SAPISID', '__Secure-1PAPISID', '__Secure-3PAPISID'
+      ];
+      
+      cookiesToClear.forEach(cookieName => {
+        document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+        document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${window.location.hostname};`;
+        document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.${window.location.hostname};`;
+        document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.google.com;`;
+        document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.accounts.google.com;`;
+      });
+      
+      // Clear localStorage and sessionStorage
+      try {
+        localStorage.removeItem('google-oauth-state');
+        sessionStorage.clear();
+      } catch (e) {
+        console.log('Could not clear storage:', e);
+      }
+      
+      // Revoke Google OAuth access if possible
+      if (userEmail && (window as any).google?.accounts?.oauth2) {
+        try {
+          (window as any).google.accounts.oauth2.revoke(userEmail, () => {
+            console.log('Google access revoked');
+          });
+        } catch (e) {
+          console.log('Could not revoke Google access:', e);
+        }
+      }
       
       // Show logged out state immediately
       showLoggedOutState();
       hideCommentForm();
       
-      console.log('User logged out, reloading page...');
+      console.log('User logged out, performing hard refresh...');
       
-      // Force complete page reload to reset Google OAuth
-      window.location.href = window.location.href;
+      // Hard refresh with cache busting
+      window.location.href = window.location.href.split('?')[0] + '?t=' + new Date().getTime();
     }
     
     // Global functions for reply system

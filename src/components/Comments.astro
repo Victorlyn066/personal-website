@@ -1753,6 +1753,44 @@ const { postSlug } = Astro.props;
       return date.toLocaleDateString() + ' at ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
     }
     
+    function reloadGoogleOAuthScripts() {
+      console.log('=== RELOADING GOOGLE OAUTH SCRIPTS ===');
+      
+      // Remove existing Google scripts
+      const existingScripts = document.querySelectorAll('script[src*="accounts.google.com"]');
+      existingScripts.forEach(script => {
+        console.log('Removing existing Google script');
+        script.remove();
+      });
+      
+      // Clear Google global objects
+      if ((window as any).google) {
+        delete (window as any).google;
+        console.log('✅ Cleared Google global object');
+      }
+      
+      // Create a fresh script element with cache busting
+      const script = document.createElement('script');
+      script.src = `https://accounts.google.com/gsi/client?t=${Date.now()}`;
+      script.async = true;
+      script.defer = true;
+      
+      script.onload = () => {
+        console.log('✅ Google OAuth script reloaded');
+        // Wait a bit for the script to initialize
+        setTimeout(() => {
+          initializeGoogleOAuth();
+        }, 1000);
+      };
+      
+      script.onerror = () => {
+        console.error('❌ Failed to reload Google OAuth script');
+      };
+      
+      document.head.appendChild(script);
+      console.log('✅ Added fresh Google OAuth script');
+    }
+    
     function handleLogout() {
       console.log('=== STARTING LOGOUT PROCESS ===');
       
@@ -1798,15 +1836,15 @@ const { postSlug } = Astro.props;
       hideCommentForm();
       console.log('✅ Updated UI to logged out state');
       
-      // Reinitialize Google OAuth after a short delay
+      // Force reload of Google OAuth scripts and reinitialize
       setTimeout(() => {
-        console.log('Reinitializing Google OAuth...');
-        initializeGoogleOAuth();
+        console.log('Reloading Google OAuth scripts...');
+        reloadGoogleOAuthScripts();
       }, 1000);
       
       console.log('=== LOGOUT PROCESS COMPLETE ===');
     }
-    
+
     function initializeGoogleOAuth() {
       console.log('=== INITIALIZING GOOGLE OAUTH ===');
       
@@ -1825,9 +1863,11 @@ const { postSlug } = Astro.props;
           cancel_on_tap_outside: false
         });
         
-        // Render the sign-in button
+        // Clear and recreate the sign-in button container
         const signInContainer = document.querySelector('.g_id_signin');
         if (signInContainer) {
+          signInContainer.innerHTML = '';  // Clear existing content
+          
           (window as any).google.accounts.id.renderButton(signInContainer, {
             type: 'standard',
             shape: 'rectangular',

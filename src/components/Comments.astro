@@ -602,16 +602,21 @@ const { postSlug } = Astro.props;
   }
 
   .replies-container {
-    margin-left: 50px !important;
-    margin-top: 0.5rem;
-    margin-bottom: 1.5rem;
-    border-left: 4px solid #4285f4;
-    padding-left: 20px !important;
-    position: relative;
-    background: rgba(66, 133, 244, 0.02);
-    border-radius: 0 8px 8px 0;
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
+    margin-left: 60px !important;
+    margin-top: 1rem !important;
+    margin-bottom: 1.5rem !important;
+    border-left: 6px solid #4285f4 !important;
+    padding-left: 25px !important;
+    position: relative !important;
+    background: rgba(66, 133, 244, 0.05) !important;
+    border-radius: 0 12px 12px 0 !important;
+    padding-top: 1rem !important;
+    padding-bottom: 1rem !important;
+    padding-right: 1rem !important;
+    transform: translateX(0) !important;
+    display: block !important;
+    width: calc(100% - 60px) !important;
+    box-sizing: border-box !important;
   }
 
   .replies-container::before {
@@ -1435,7 +1440,7 @@ const { postSlug } = Astro.props;
       
       commentsList.innerHTML = comments.map((comment: any) => {
         const repliesHtml = (comment.replies && comment.replies.length > 0) ? `
-          <div class="replies-container">
+          <div class="replies-container" style="margin-left: 60px !important; background: #e3f2fd !important; border-left: 6px solid #4285f4 !important; padding: 1rem !important; border-radius: 0 12px 12px 0 !important;">
             ${comment.replies.map((reply: any) => `
                               <div class="reply-item">
                   <div class="reply-body">
@@ -1689,6 +1694,14 @@ const { postSlug } = Astro.props;
       return modal;
     }
     
+    // Debug function to clear comments (temporary)
+    (window as any).clearComments = function() {
+      const commentsKey = `comments_${postSlug}`;
+      localStorage.removeItem(commentsKey);
+      loadComments();
+      console.log('Comments cleared for testing');
+    };
+
     (window as any).submitReply = function(commentId: string) {
       if (!currentUser) return;
       

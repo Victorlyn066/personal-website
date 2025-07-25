@@ -1130,22 +1130,7 @@ const { postSlug } = Astro.props;
     const showRegisterBtn = document.getElementById('show-register');
     const showLoginBtn = document.getElementById('show-login');
     
-    // Check if we just refreshed from logout
-    const logoutRefresh = localStorage.getItem('oauth-logout-refresh');
-    const urlParams = new URLSearchParams(window.location.search);
-    const hasRefreshParams = urlParams.has('_t') && urlParams.has('_r');
-    
-    if (logoutRefresh || hasRefreshParams) {
-      localStorage.removeItem('oauth-logout-refresh');
-      console.log('✅ HARD refresh completed after logout - OAuth state is clean!');
-      
-      // Clean up URL if it has refresh parameters
-      if (hasRefreshParams) {
-        const cleanUrl = window.location.pathname;
-        window.history.replaceState({}, document.title, cleanUrl);
-        console.log('✅ Cleaned up refresh parameters from URL');
-      }
-    }
+    // Simple, clean initialization - no special logout handling needed
     
     // Check if user is already logged in
     checkLoginStatus();
@@ -1909,16 +1894,24 @@ const { postSlug } = Astro.props;
       });
       console.log('✅ Cleared Google cookies');
       
-      // Show logged out state
-      showLoggedOutState();
-      hideCommentForm();
-      console.log('✅ Updated UI to logged out state');
+      // Show user feedback that logout is happening
+      const userSection = document.getElementById('user-section');
+      if (userSection) {
+        userSection.innerHTML = '<div style="color: #666; font-style: italic; padding: 1rem;">Signing out...</div>';
+      }
       
-      // Instead of refreshing, completely reset Google OAuth in place
+      console.log('🔄 Performing hard refresh (Cmd+Shift+R equivalent)...');
+      
+      // Force a hard refresh - the most reliable solution
       setTimeout(() => {
-        console.log('🔄 Completely resetting Google OAuth without page refresh...');
-        resetGoogleOAuthCompletely();
-      }, 500);
+        // Use the location.reload() with force parameter (even though deprecated, still works)
+        try {
+          (location as any).reload(true);
+        } catch (e) {
+          // Fallback: Complete page reload
+          window.location.href = window.location.href;
+        }
+      }, 300);
       
       console.log('=== LOGOUT PROCESS COMPLETE ===');
     }

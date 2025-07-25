@@ -1770,42 +1770,103 @@ const { postSlug } = Astro.props;
       return date.toLocaleDateString() + ' at ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
     }
     
-    function reloadGoogleOAuthScripts() {
-      console.log('=== RELOADING GOOGLE OAUTH SCRIPTS ===');
+    function resetGoogleOAuthCompletely() {
+      console.log('=== COMPLETE GOOGLE OAUTH RESET ===');
       
-      // Remove existing Google scripts
+      // Step 1: Remove all Google-related DOM elements
+      const googleContainer = document.getElementById('google-signin-container');
+      const gOnload = document.getElementById('g_id_onload');
+      const gSignin = document.querySelector('.g_id_signin');
       const existingScripts = document.querySelectorAll('script[src*="accounts.google.com"]');
-      existingScripts.forEach(script => {
-        console.log('Removing existing Google script');
-        script.remove();
-      });
       
-      // Clear Google global objects
+      console.log('🗑️ Removing all Google elements...');
+      if (googleContainer) googleContainer.remove();
+      if (gOnload) gOnload.remove();
+      if (gSignin) gSignin.remove();
+      existingScripts.forEach(script => script.remove());
+      
+      // Step 2: Completely clear Google globals and state
       if ((window as any).google) {
         delete (window as any).google;
-        console.log('✅ Cleared Google global object');
+        console.log('✅ Deleted Google global object');
       }
       
-      // Create a fresh script element with cache busting
+      // Clear any Google-related window properties
+      ['gapi', '__GOOGLEAPIS', '__G_SSO_IFRAME'].forEach(prop => {
+        if ((window as any)[prop]) {
+          delete (window as any)[prop];
+        }
+      });
+      
+      // Step 3: Recreate the entire Google OAuth structure from scratch
+      setTimeout(() => {
+        console.log('🔨 Recreating Google OAuth structure...');
+        recreateGoogleOAuth();
+      }, 500);
+    }
+    
+    function recreateGoogleOAuth() {
+      console.log('=== RECREATING GOOGLE OAUTH FROM SCRATCH ===');
+      
+      // Recreate the login section HTML structure
+      const loginSection = document.getElementById('login-section');
+      if (loginSection) {
+        const newGoogleContainer = document.createElement('div');
+        newGoogleContainer.id = 'google-signin-container';
+        newGoogleContainer.className = 'google-signin-centered';
+        newGoogleContainer.style.display = 'flex';
+        
+        // Create g_id_onload div
+        const gOnload = document.createElement('div');
+        gOnload.id = 'g_id_onload';
+        gOnload.setAttribute('data-client_id', '175048817524-o1dvmrsjvskvtth2vdno9dn28h3fkpjr.apps.googleusercontent.com');
+        gOnload.setAttribute('data-context', 'signin');
+        gOnload.setAttribute('data-ux_mode', 'popup');
+        gOnload.setAttribute('data-callback', 'handleCredentialResponse');
+        gOnload.setAttribute('data-auto_prompt', 'false');
+        
+        // Create g_id_signin div
+        const gSignin = document.createElement('div');
+        gSignin.className = 'g_id_signin';
+        gSignin.setAttribute('data-type', 'standard');
+        gSignin.setAttribute('data-shape', 'rectangular');
+        gSignin.setAttribute('data-theme', 'outline');
+        gSignin.setAttribute('data-text', 'signin_with');
+        gSignin.setAttribute('data-size', 'large');
+        gSignin.setAttribute('data-logo_alignment', 'left');
+        
+        newGoogleContainer.appendChild(gOnload);
+        newGoogleContainer.appendChild(gSignin);
+        loginSection.appendChild(newGoogleContainer);
+        
+        console.log('✅ Recreated Google OAuth HTML structure');
+        
+        // Step 4: Load fresh Google script
+        loadFreshGoogleScript();
+      }
+    }
+    
+    function loadFreshGoogleScript() {
+      console.log('📥 Loading completely fresh Google script...');
+      
+      // Create script with maximum cache busting
       const script = document.createElement('script');
-      script.src = `https://accounts.google.com/gsi/client?t=${Date.now()}`;
+      script.src = `https://accounts.google.com/gsi/client?v=${Date.now()}&_cb=${Math.random()}`;
       script.async = true;
       script.defer = true;
       
       script.onload = () => {
-        console.log('✅ Google OAuth script reloaded');
-        // Wait a bit for the script to initialize
+        console.log('✅ Fresh Google script loaded');
         setTimeout(() => {
           initializeGoogleOAuth();
         }, 1000);
       };
       
       script.onerror = () => {
-        console.error('❌ Failed to reload Google OAuth script');
+        console.error('❌ Failed to load fresh Google script');
       };
       
       document.head.appendChild(script);
-      console.log('✅ Added fresh Google OAuth script');
     }
     
     function handleLogout() {
@@ -1853,48 +1914,11 @@ const { postSlug } = Astro.props;
       hideCommentForm();
       console.log('✅ Updated UI to logged out state');
       
-      // Set a logout flag and perform a HARD refresh with cache bypass
-      localStorage.setItem('oauth-logout-refresh', 'true');
-      
-      // Show user feedback
-      const userSection = document.getElementById('user-section');
-      if (userSection) {
-        userSection.innerHTML = '<div style="color: #666; font-style: italic;">Refreshing page...</div>';
-      }
-      
+      // Instead of refreshing, completely reset Google OAuth in place
       setTimeout(() => {
-        console.log('Performing HARD refresh (Cmd+Shift+R equivalent)...');
-        
-        // Force a hard refresh by manipulating browser cache headers
-        if ('serviceWorker' in navigator) {
-          // Clear service worker cache if it exists
-          navigator.serviceWorker.getRegistrations().then(registrations => {
-            registrations.forEach(registration => registration.unregister());
-          });
-        }
-        
-        // Clear all possible browser storage
-        try {
-          sessionStorage.clear();
-          // Clear specific caches if available
-          if ('caches' in window) {
-            caches.keys().then(names => {
-              names.forEach(name => caches.delete(name));
-            });
-          }
-        } catch (e) {
-          console.log('Could not clear some caches:', e);
-        }
-        
-        // Method 1: Force reload with cache bypass using location.replace
-        const url = new URL(window.location.href);
-        url.searchParams.set('_t', Date.now().toString());
-        url.searchParams.set('_r', Math.random().toString());
-        
-        // Use location.replace to force a true navigation (not just refresh)
-        window.location.replace(url.toString());
-        
-      }, 200);
+        console.log('🔄 Completely resetting Google OAuth without page refresh...');
+        resetGoogleOAuthCompletely();
+      }, 500);
       
       console.log('=== LOGOUT PROCESS COMPLETE ===');
     }

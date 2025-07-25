@@ -1130,6 +1130,13 @@ const { postSlug } = Astro.props;
     const showRegisterBtn = document.getElementById('show-register');
     const showLoginBtn = document.getElementById('show-login');
     
+    // Check if we just refreshed from logout
+    const logoutRefresh = localStorage.getItem('oauth-logout-refresh');
+    if (logoutRefresh) {
+      localStorage.removeItem('oauth-logout-refresh');
+      console.log('✅ Page refreshed after logout - OAuth state should be clean');
+    }
+    
     // Check if user is already logged in
     checkLoginStatus();
     
@@ -1836,11 +1843,23 @@ const { postSlug } = Astro.props;
       hideCommentForm();
       console.log('✅ Updated UI to logged out state');
       
-      // Force reload of Google OAuth scripts and reinitialize
+      // Set a logout flag and perform a hard refresh
+      localStorage.setItem('oauth-logout-refresh', 'true');
+      
       setTimeout(() => {
-        console.log('Reloading Google OAuth scripts...');
-        reloadGoogleOAuthScripts();
-      }, 1000);
+        console.log('Performing hard refresh to reset OAuth state...');
+        
+        // Method 1: Try using meta refresh for hard reload
+        const meta = document.createElement('meta');
+        meta.httpEquiv = 'refresh';
+        meta.content = '0';
+        document.head.appendChild(meta);
+        
+        // Method 2: Fallback to location href replacement
+        setTimeout(() => {
+          window.location.href = window.location.href;
+        }, 100);
+      }, 300);
       
       console.log('=== LOGOUT PROCESS COMPLETE ===');
     }

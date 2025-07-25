@@ -395,11 +395,43 @@ const { postSlug } = Astro.props;
   }
 
   .comment-item {
+    display: flex;
+    gap: 0.75rem;
     background: white;
-    padding: 1.5rem;
-    border-radius: 8px;
-    border: 1px solid #dee2e6;
-    margin-bottom: 1rem;
+    padding: 1.25rem;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+  }
+
+  .comment-item:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-color: #d1d5db;
+  }
+
+  .comment-avatar {
+    flex-shrink: 0;
+  }
+
+  .avatar-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #e5e7eb;
+    background: #f3f4f6;
+  }
+
+  .avatar-img.small {
+    width: 32px;
+    height: 32px;
+  }
+
+  .comment-body {
+    flex: 1;
+    min-width: 0;
   }
 
   .comment-main {
@@ -440,19 +472,33 @@ const { postSlug } = Astro.props;
   }
 
   .reply-btn {
-    padding: 0.25rem 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.5rem 0.75rem;
     background: transparent;
     color: #4285f4;
     border: 1px solid #4285f4;
-    border-radius: 4px;
-    font-size: 0.85rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
     cursor: pointer;
     transition: all 0.3s ease;
+    font-weight: 500;
   }
 
   .reply-btn:hover {
     background: #4285f4;
     color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(66, 133, 244, 0.3);
+  }
+
+  .reply-btn svg {
+    transition: transform 0.2s ease;
+  }
+
+  .reply-btn:hover svg {
+    transform: translateX(-2px);
   }
 
   .replies-container {
@@ -463,12 +509,23 @@ const { postSlug } = Astro.props;
   }
 
   .reply-item {
+    display: flex;
+    gap: 0.5rem;
     background: #f8f9fa;
     padding: 1rem;
-    border-radius: 6px;
+    border-radius: 10px;
     margin-bottom: 0.75rem;
     border: 1px solid #e9ecef;
     position: relative;
+  }
+
+  .reply-avatar {
+    flex-shrink: 0;
+  }
+
+  .reply-body {
+    flex: 1;
+    min-width: 0;
   }
 
   .reply-item::before {
@@ -670,6 +727,70 @@ const { postSlug } = Astro.props;
       flex-wrap: wrap;
     }
   }
+  /* Reply Form Header */
+  .reply-form-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    padding: 0.75rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+  }
+
+  .reply-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid #dee2e6;
+  }
+
+  .reply-as {
+    font-size: 0.875rem;
+    color: #666;
+    font-weight: 500;
+  }
+
+  /* Enhanced No Comments Message */
+  .no-comments {
+    text-align: center;
+    color: #6c757d;
+    font-style: italic;
+    padding: 3rem 2rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 12px;
+    border: 2px dashed #dee2e6;
+    font-size: 1.1rem;
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 640px) {
+    .comment-item {
+      gap: 0.5rem;
+      padding: 1rem;
+    }
+    
+    .avatar-img {
+      width: 32px;
+      height: 32px;
+    }
+    
+    .avatar-img.small {
+      width: 24px;
+      height: 24px;
+    }
+    
+    .reply-form-header {
+      padding: 0.5rem;
+    }
+    
+    .reply-avatar {
+      width: 20px;
+      height: 20px;
+    }
+  }
 </style>
 
 <!-- Google Identity Services -->
@@ -762,7 +883,7 @@ const { postSlug } = Astro.props;
           id: 'google_' + payload.sub,
           name: payload.name,
           email: payload.email,
-          picture: payload.picture,
+          picture: payload.picture || `https://ui-avatars.com/api/?name=${encodeURIComponent(payload.name)}&background=4285f4&color=fff&size=40`,
           provider: 'google'
         };
         
@@ -1117,6 +1238,7 @@ const { postSlug } = Astro.props;
         content: commentText,
         date: new Date().toISOString(),
         timestamp: Date.now(),
+        userPicture: currentUser.picture,
         replies: []
       };
       
@@ -1139,7 +1261,7 @@ const { postSlug } = Astro.props;
       if (!commentsList) return;
       
       if (comments.length === 0) {
-        commentsList.innerHTML = '<div class="no-comments">No comments yet. Be the first to comment!</div>';
+        commentsList.innerHTML = '<div class="no-comments">💬 No comments yet. Be the first to share your thoughts!</div>';
         return;
       }
       
@@ -1148,11 +1270,19 @@ const { postSlug } = Astro.props;
           <div class="replies-container">
             ${comment.replies.map((reply: any) => `
               <div class="reply-item">
-                <div class="comment-header">
-                  <span class="comment-author">${reply.author}</span>
-                  <span class="comment-date">${formatDate(reply.date)}</span>
+                <div class="reply-avatar">
+                  <img src="${reply.userPicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(reply.author)}&background=4285f4&color=fff&size=32`}" 
+                       alt="${reply.author}" 
+                       class="avatar-img small"
+                       onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(reply.author)}&background=4285f4&color=fff&size=32'" />
                 </div>
-                <div class="comment-content">${reply.content}</div>
+                <div class="reply-body">
+                  <div class="comment-header">
+                    <span class="comment-author">${reply.author}</span>
+                    <span class="comment-date">${formatDate(reply.date)}</span>
+                  </div>
+                  <div class="comment-content">${reply.content}</div>
+                </div>
               </div>
             `).join('')}
           </div>
@@ -1161,19 +1291,38 @@ const { postSlug } = Astro.props;
         return `
           <div class="comment-thread">
             <div class="comment-item comment-main" data-comment-id="${comment.id}">
-              <div class="comment-header">
-                <span class="comment-author">${comment.author}</span>
-                <span class="comment-date">${formatDate(comment.date)}</span>
+              <div class="comment-avatar">
+                <img src="${comment.userPicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.author)}&background=4285f4&color=fff&size=40`}" 
+                     alt="${comment.author}" 
+                     class="avatar-img"
+                     onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(comment.author)}&background=4285f4&color=fff&size=40'" />
               </div>
-              <div class="comment-content">${comment.content}</div>
-              <div class="comment-actions">
-                ${currentUser ? `<button class="reply-btn" onclick="showReplyForm('${comment.id}')">Reply</button>` : ''}
-              </div>
-              <div id="reply-form-${comment.id}" class="reply-form" style="display: none;">
-                <textarea placeholder="Write a reply..." rows="3"></textarea>
-                <div class="reply-actions">
-                  <button class="submit-reply-btn" onclick="submitReply('${comment.id}')">Post Reply</button>
-                  <button class="cancel-reply-btn" onclick="hideReplyForm('${comment.id}')">Cancel</button>
+              <div class="comment-body">
+                <div class="comment-header">
+                  <span class="comment-author">${comment.author}</span>
+                  <span class="comment-date">${formatDate(comment.date)}</span>
+                </div>
+                <div class="comment-content">${comment.content}</div>
+                <div class="comment-actions">
+                  ${currentUser ? `<button class="reply-btn" onclick="showReplyForm('${comment.id}')">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/>
+                    </svg>
+                    Reply
+                  </button>` : ''}
+                </div>
+                <div id="reply-form-${comment.id}" class="reply-form" style="display: none;">
+                  <div class="reply-form-header">
+                    <img src="${currentUser?.picture || `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser?.name || 'User')}&background=4285f4&color=fff&size=32`}" 
+                         alt="${currentUser?.name || 'User'}" 
+                         class="reply-avatar" />
+                    <span class="reply-as">Replying as ${currentUser?.name || 'User'}</span>
+                  </div>
+                  <textarea placeholder="Write a thoughtful reply..." rows="3"></textarea>
+                  <div class="reply-actions">
+                    <button class="submit-reply-btn" onclick="submitReply('${comment.id}')">Post Reply</button>
+                    <button class="cancel-reply-btn" onclick="hideReplyForm('${comment.id}')">Cancel</button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1228,7 +1377,8 @@ const { postSlug } = Astro.props;
         author: currentUser.name,
         content: replyText,
         date: new Date().toISOString(),
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        userPicture: currentUser.picture
       };
       
       const commentsKey = `comments_${postSlug}`;

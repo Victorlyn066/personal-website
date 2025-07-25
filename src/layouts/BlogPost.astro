@@ -6,6 +6,7 @@ import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import AuthorBio from '../components/AuthorBio.astro';
 import LikeButton from '../components/LikeButton.astro';
+import Comments from '../components/Comments.astro';
 import { Image } from 'astro:assets';
 
 type Props = CollectionEntry<'blog'>['data'];
@@ -99,6 +100,7 @@ const postId = Astro.url.pathname.replace(/^\/blog\//, '').replace(/\/$/, '');
 						<LikeButton postId={postId} size="large" />
 					</div>
 					<AuthorBio />
+					<Comments postSlug={postId} />
 				</div>
 			</article>
 		</main>

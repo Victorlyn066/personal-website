@@ -1,0 +1,743 @@
+---
+// Comments Component with Gmail Login
+interface Props {
+  postSlug: string;
+}
+
+const { postSlug } = Astro.props;
+---
+
+<div class="comments-section" id="comments-section" data-post-slug={postSlug}>
+  <h3>Comments</h3>
+  
+  <!-- Login Section -->
+  <div id="login-section" class="login-section">
+    <p>Sign in with Google to leave a comment</p>
+    <button id="google-signin-btn" class="google-signin-btn">
+      <svg width="20" height="20" viewBox="0 0 24 24">
+        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+      </svg>
+      Sign in with Google
+    </button>
+  </div>
+
+  <!-- User Info Section (hidden initially) -->
+  <div id="user-section" class="user-section" style="display: none;">
+    <div class="user-info">
+      <div class="user-details">
+        <span id="user-name"></span>
+        <button id="logout-btn" class="logout-btn">Sign Out</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Comment Form (hidden initially) -->
+  <div id="comment-form-section" class="comment-form-section" style="display: none;">
+    <form id="comment-form" class="comment-form">
+      <textarea 
+        id="comment-text" 
+        placeholder="Write your comment..." 
+        rows="4" 
+        required
+      ></textarea>
+      <div class="form-actions">
+        <button type="submit" class="submit-comment-btn">Post Comment</button>
+        <button type="button" id="cancel-comment-btn" class="cancel-comment-btn">Cancel</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Comments List -->
+  <div id="comments-list" class="comments-list">
+    <!-- Comments will be loaded here -->
+  </div>
+
+  <!-- Add Comment Button (for logged in users) -->
+  <button id="add-comment-btn" class="add-comment-btn" style="display: none;">
+    Add a Comment
+  </button>
+</div>
+
+<style>
+  .comments-section {
+    margin-top: 3rem;
+    padding: 2rem;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border: 1px solid #e9ecef;
+  }
+
+  .comments-section h3 {
+    margin-bottom: 1.5rem;
+    color: #333;
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+
+  /* Login Section */
+  .login-section {
+    text-align: center;
+    padding: 2rem;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+  }
+
+  .login-section p {
+    margin-bottom: 1rem;
+    color: #666;
+  }
+
+  .google-signin-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: white;
+    border: 2px solid #dadce0;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #3c4043;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .google-signin-btn:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border-color: #4285f4;
+  }
+
+  /* User Section */
+  .user-section {
+    margin-bottom: 1.5rem;
+  }
+
+  .user-info {
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+  }
+
+  .user-details {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .logout-btn {
+    padding: 0.4rem 0.8rem;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+
+  .logout-btn:hover {
+    background: #c82333;
+  }
+
+  /* Comment Form */
+  .comment-form-section {
+    margin-bottom: 2rem;
+  }
+
+  .comment-form {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+  }
+
+  .comment-form textarea {
+    width: 100%;
+    border: 2px solid #e9ecef;
+    border-radius: 6px;
+    padding: 0.75rem;
+    font-size: 1rem;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 100px;
+    box-sizing: border-box;
+  }
+
+  .comment-form textarea:focus {
+    outline: none;
+    border-color: #4285f4;
+    box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .submit-comment-btn {
+    padding: 0.75rem 1.5rem;
+    background: #4285f4;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+
+  .submit-comment-btn:hover {
+    background: #3367d6;
+  }
+
+  .cancel-comment-btn {
+    padding: 0.75rem 1.5rem;
+    background: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+
+  .cancel-comment-btn:hover {
+    background: #5a6268;
+  }
+
+  /* Add Comment Button */
+  .add-comment-btn {
+    width: 100%;
+    padding: 1rem;
+    background: #4285f4;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    margin-bottom: 2rem;
+  }
+
+  .add-comment-btn:hover {
+    background: #3367d6;
+  }
+
+  /* Comments List */
+  .comments-list {
+    space-y: 1rem;
+  }
+
+  .comment-item {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    margin-bottom: 1rem;
+  }
+
+  .comment-main {
+    /* Main comment styling */
+  }
+
+  .comment-thread {
+    /* Container for main comment + its replies */
+  }
+
+  .comment-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .comment-author {
+    font-weight: 600;
+    color: #333;
+  }
+
+  .comment-date {
+    color: #6c757d;
+    font-size: 0.9rem;
+  }
+
+  .comment-content {
+    color: #495057;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    margin-bottom: 0.75rem;
+  }
+
+  .comment-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .reply-btn {
+    padding: 0.25rem 0.5rem;
+    background: transparent;
+    color: #4285f4;
+    border: 1px solid #4285f4;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .reply-btn:hover {
+    background: #4285f4;
+    color: white;
+  }
+
+  .replies-container {
+    margin-left: 40px;
+    margin-top: 1rem;
+    border-left: 3px solid #4285f4;
+    padding-left: 20px;
+  }
+
+  .reply-item {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 0.75rem;
+    border: 1px solid #e9ecef;
+    position: relative;
+  }
+
+  .reply-item::before {
+    content: "↳";
+    position: absolute;
+    left: -15px;
+    top: 10px;
+    color: #4285f4;
+    font-weight: bold;
+  }
+
+  .reply-form {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border: 1px solid #e9ecef;
+  }
+
+  .reply-form textarea {
+    width: 100%;
+    border: 2px solid #e9ecef;
+    border-radius: 6px;
+    padding: 0.5rem;
+    font-size: 0.9rem;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 80px;
+    box-sizing: border-box;
+    background: white;
+  }
+
+  .reply-form textarea:focus {
+    outline: none;
+    border-color: #4285f4;
+    box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+  }
+
+  .reply-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+  }
+
+  .submit-reply-btn {
+    padding: 0.5rem 1rem;
+    background: #4285f4;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+
+  .submit-reply-btn:hover {
+    background: #3367d6;
+  }
+
+  .cancel-reply-btn {
+    padding: 0.5rem 1rem;
+    background: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+
+  .cancel-reply-btn:hover {
+    background: #5a6268;
+  }
+
+  .no-comments {
+    text-align: center;
+    color: #6c757d;
+    padding: 2rem;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+  }
+
+  /* Dark Mode */
+  html.dark .comments-section {
+    background: #2d3748;
+    border-color: #4a5568;
+  }
+
+  html.dark .comments-section h3 {
+    color: #e2e8f0;
+  }
+
+  html.dark .login-section,
+  html.dark .user-info,
+  html.dark .comment-form,
+  html.dark .comment-item,
+  html.dark .no-comments {
+    background: #1a202c;
+    border-color: #4a5568;
+  }
+
+  html.dark .login-section p,
+  html.dark .comment-date,
+  html.dark .no-comments {
+    color: #a0aec0;
+  }
+
+  html.dark .comment-author,
+  html.dark .comment-content {
+    color: #e2e8f0;
+  }
+
+  html.dark .comment-form textarea,
+  html.dark .reply-form textarea {
+    background: #2d3748;
+    border-color: #4a5568;
+    color: #e2e8f0;
+  }
+
+  html.dark .comment-form textarea:focus,
+  html.dark .reply-form textarea:focus {
+    border-color: #4285f4;
+  }
+
+  html.dark .reply-item {
+    background: #2d3748;
+    border-color: #4a5568;
+  }
+
+  html.dark .reply-form {
+    background: #2d3748;
+    border-color: #4a5568;
+  }
+
+  html.dark .replies-container {
+    border-left-color: #4285f4;
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+    .comments-section {
+      padding: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .user-details {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+
+    .form-actions,
+    .reply-actions {
+      flex-direction: column;
+    }
+
+    .submit-comment-btn,
+    .cancel-comment-btn,
+    .submit-reply-btn,
+    .cancel-reply-btn {
+      width: 100%;
+    }
+
+    .replies-container {
+      margin-left: 20px;
+      padding-left: 15px;
+    }
+
+    .reply-item::before {
+      left: -10px;
+    }
+
+    .comment-actions {
+      flex-wrap: wrap;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const postSlug = document.querySelector('.comments-section')?.getAttribute('data-post-slug') || 'unknown';
+    
+    // Mock user data (in real implementation, this would come from Google OAuth)
+    let currentUser: any = null;
+    
+    // DOM elements
+    const loginSection = document.getElementById('login-section');
+    const userSection = document.getElementById('user-section');
+    const commentFormSection = document.getElementById('comment-form-section');
+    const commentsList = document.getElementById('comments-list');
+    const addCommentBtn = document.getElementById('add-comment-btn');
+    const googleSigninBtn = document.getElementById('google-signin-btn');
+    const logoutBtn = document.getElementById('logout-btn');
+    const commentForm = document.getElementById('comment-form');
+    const cancelCommentBtn = document.getElementById('cancel-comment-btn');
+    
+    // Check if user is already logged in
+    checkLoginStatus();
+    
+    // Load comments for this post
+    loadComments();
+    
+    // Event listeners
+    if (googleSigninBtn) {
+      googleSigninBtn.addEventListener('click', handleGoogleSignIn);
+    }
+    
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', handleLogout);
+    }
+    
+    if (addCommentBtn) {
+      addCommentBtn.addEventListener('click', showCommentForm);
+    }
+    
+    if (cancelCommentBtn) {
+      cancelCommentBtn.addEventListener('click', hideCommentForm);
+    }
+    
+    if (commentForm) {
+      commentForm.addEventListener('submit', handleCommentSubmit);
+    }
+    
+    function checkLoginStatus() {
+      const userData = localStorage.getItem('blog-user');
+      if (userData) {
+        currentUser = JSON.parse(userData);
+        showLoggedInState();
+      } else {
+        showLoggedOutState();
+      }
+    }
+    
+    function handleGoogleSignIn() {
+      // Mock Google OAuth (in real implementation, use Google OAuth library)
+      const mockUser = {
+        id: 'user_' + Date.now(),
+        name: 'Demo User',
+        email: 'demo@gmail.com'
+      };
+      
+      currentUser = mockUser;
+      localStorage.setItem('blog-user', JSON.stringify(currentUser));
+      showLoggedInState();
+    }
+    
+    function handleLogout() {
+      currentUser = null;
+      localStorage.removeItem('blog-user');
+      showLoggedOutState();
+      hideCommentForm();
+    }
+    
+    function showLoggedInState() {
+      if (!currentUser) return;
+      
+      if (loginSection) loginSection.style.display = 'none';
+      if (userSection) userSection.style.display = 'block';
+      if (addCommentBtn) addCommentBtn.style.display = 'block';
+      
+      // Update user info
+      const userName = document.getElementById('user-name');
+      
+      if (userName) userName.textContent = currentUser.name;
+    }
+    
+    function showLoggedOutState() {
+      if (loginSection) loginSection.style.display = 'block';
+      if (userSection) userSection.style.display = 'none';
+      if (addCommentBtn) addCommentBtn.style.display = 'none';
+    }
+    
+    function showCommentForm() {
+      if (commentFormSection) {
+        commentFormSection.style.display = 'block';
+        const textarea = document.getElementById('comment-text');
+        if (textarea) textarea.focus();
+      }
+      if (addCommentBtn) addCommentBtn.style.display = 'none';
+    }
+    
+    function hideCommentForm() {
+      if (commentFormSection) commentFormSection.style.display = 'none';
+      if (addCommentBtn && currentUser) addCommentBtn.style.display = 'block';
+      
+      const textarea = document.getElementById('comment-text') as HTMLTextAreaElement;
+      if (textarea) textarea.value = '';
+    }
+    
+    function handleCommentSubmit(e: any) {
+      e.preventDefault();
+      
+      if (!currentUser) return;
+      
+      const textarea = document.getElementById('comment-text') as HTMLTextAreaElement;
+      const commentText = textarea?.value.trim();
+      
+      if (!commentText) return;
+      
+      const comment = {
+        id: 'comment_' + Date.now(),
+        postSlug: postSlug,
+        author: currentUser.name,
+        content: commentText,
+        date: new Date().toISOString(),
+        timestamp: Date.now(),
+        replies: []
+      };
+      
+      saveComment(comment);
+      loadComments();
+      hideCommentForm();
+    }
+    
+    function saveComment(comment: any) {
+      const commentsKey = `comments_${postSlug}`;
+      let comments = JSON.parse(localStorage.getItem(commentsKey) || '[]');
+      comments.unshift(comment); // Add to beginning (newest first)
+      localStorage.setItem(commentsKey, JSON.stringify(comments));
+    }
+    
+    function loadComments() {
+      const commentsKey = `comments_${postSlug}`;
+      const comments = JSON.parse(localStorage.getItem(commentsKey) || '[]');
+      
+      if (!commentsList) return;
+      
+      if (comments.length === 0) {
+        commentsList.innerHTML = '<div class="no-comments">No comments yet. Be the first to comment!</div>';
+        return;
+      }
+      
+      commentsList.innerHTML = comments.map((comment: any) => {
+        const repliesHtml = (comment.replies && comment.replies.length > 0) ? `
+          <div class="replies-container">
+            ${comment.replies.map((reply: any) => `
+              <div class="reply-item">
+                <div class="comment-header">
+                  <span class="comment-author">${reply.author}</span>
+                  <span class="comment-date">${formatDate(reply.date)}</span>
+                </div>
+                <div class="comment-content">${reply.content}</div>
+              </div>
+            `).join('')}
+          </div>
+        ` : '';
+        
+        return `
+          <div class="comment-thread">
+            <div class="comment-item comment-main" data-comment-id="${comment.id}">
+              <div class="comment-header">
+                <span class="comment-author">${comment.author}</span>
+                <span class="comment-date">${formatDate(comment.date)}</span>
+              </div>
+              <div class="comment-content">${comment.content}</div>
+              <div class="comment-actions">
+                ${currentUser ? `<button class="reply-btn" onclick="showReplyForm('${comment.id}')">Reply</button>` : ''}
+              </div>
+              <div id="reply-form-${comment.id}" class="reply-form" style="display: none;">
+                <textarea placeholder="Write a reply..." rows="3"></textarea>
+                <div class="reply-actions">
+                  <button class="submit-reply-btn" onclick="submitReply('${comment.id}')">Post Reply</button>
+                  <button class="cancel-reply-btn" onclick="hideReplyForm('${comment.id}')">Cancel</button>
+                </div>
+              </div>
+            </div>
+            ${repliesHtml}
+          </div>
+        `;
+      }).join('');
+    }
+    
+    function formatDate(dateString: any) {
+      const date = new Date(dateString);
+      return date.toLocaleDateString() + ' at ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    }
+    
+    // Global functions for reply system
+    (window as any).showReplyForm = function(commentId: string) {
+      const replyForm = document.getElementById(`reply-form-${commentId}`);
+      if (replyForm) {
+        replyForm.style.display = 'block';
+        const textarea = replyForm.querySelector('textarea');
+        if (textarea) textarea.focus();
+      }
+    };
+    
+    (window as any).hideReplyForm = function(commentId: string) {
+      const replyForm = document.getElementById(`reply-form-${commentId}`);
+      if (replyForm) {
+        replyForm.style.display = 'none';
+        const textarea = replyForm.querySelector('textarea') as HTMLTextAreaElement;
+        if (textarea) textarea.value = '';
+      }
+    };
+    
+    (window as any).submitReply = function(commentId: string) {
+      if (!currentUser) return;
+      
+      const replyForm = document.getElementById(`reply-form-${commentId}`);
+      const textarea = replyForm?.querySelector('textarea') as HTMLTextAreaElement;
+      const replyText = textarea?.value.trim();
+      
+      if (!replyText) return;
+      
+      const reply = {
+        id: 'reply_' + Date.now(),
+        author: currentUser.name,
+        content: replyText,
+        date: new Date().toISOString(),
+        timestamp: Date.now()
+      };
+      
+      const commentsKey = `comments_${postSlug}`;
+      let comments = JSON.parse(localStorage.getItem(commentsKey) || '[]');
+      
+      // Find the parent comment and add the reply
+      comments = comments.map((comment: any) => {
+        if (comment.id === commentId) {
+          if (!comment.replies) comment.replies = [];
+          comment.replies.push(reply);
+        }
+        return comment;
+      });
+      
+      localStorage.setItem(commentsKey, JSON.stringify(comments));
+      loadComments();
+      (window as any).hideReplyForm(commentId);
+    };
+  });
+</script> 

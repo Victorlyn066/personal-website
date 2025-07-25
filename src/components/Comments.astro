@@ -1902,16 +1902,35 @@ const { postSlug } = Astro.props;
       
       console.log('🔄 Performing hard refresh (Cmd+Shift+R equivalent)...');
       
-      // Force a hard refresh - the most reliable solution
+      // Try the most direct approach - keyboard simulation
       setTimeout(() => {
-        // Use the location.reload() with force parameter (even though deprecated, still works)
+        console.log('Attempting to simulate Cmd+Shift+R...');
+        
+        // Method 1: Try to trigger browser refresh via keyboard event
         try {
-          (location as any).reload(true);
+          const event = new KeyboardEvent('keydown', {
+            key: 'r',
+            code: 'KeyR',
+            ctrlKey: true,
+            shiftKey: true,
+            metaKey: navigator.platform.indexOf('Mac') > -1, // Use Cmd on Mac, Ctrl on others
+            bubbles: true,
+            cancelable: true
+          });
+          document.dispatchEvent(event);
+          console.log('Dispatched hard refresh keyboard event');
         } catch (e) {
-          // Fallback: Complete page reload
-          window.location.href = window.location.href;
+          console.log('Keyboard simulation failed:', e);
         }
-      }, 300);
+        
+        // Method 2: Force reload with maximum cache bypass
+        setTimeout(() => {
+          console.log('Forcing window replacement...');
+          // This should work like a hard refresh
+          window.location.replace(window.location.protocol + '//' + window.location.host + window.location.pathname + window.location.search + (window.location.search ? '&' : '?') + '_t=' + Date.now());
+        }, 500);
+        
+      }, 100);
       
       console.log('=== LOGOUT PROCESS COMPLETE ===');
     }

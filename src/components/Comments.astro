@@ -1183,9 +1183,18 @@ const { postSlug } = Astro.props;
     function checkLoginStatus() {
       const userData = localStorage.getItem('blog-user');
       if (userData) {
-        currentUser = JSON.parse(userData);
-        showLoggedInState();
+        try {
+          currentUser = JSON.parse(userData);
+          console.log('Restored user from localStorage:', currentUser);
+          showLoggedInState();
+          showCommentForm();
+        } catch (error) {
+          console.error('Error parsing user data:', error);
+          localStorage.removeItem('blog-user');
+          showLoggedOutState();
+        }
       } else {
+        console.log('No user data found, showing logged out state');
         showLoggedOutState();
       }
     }
@@ -1207,11 +1216,15 @@ const { postSlug } = Astro.props;
         currentUser = user;
         localStorage.setItem('blog-user', JSON.stringify(currentUser));
         
-        // Small delay to ensure DOM is ready
-        setTimeout(() => {
-          showLoggedInState();
-          console.log('User logged in and comment form should be visible');
-        }, 100);
+        // Immediately show logged in state and comment form
+        showLoggedInState();
+        showCommentForm();
+        
+        // Also reload comments to ensure reply buttons appear
+        loadComments();
+        
+        console.log('User logged in successfully:', user);
+        console.log('Comment form should now be visible');
         
         console.log('Google Sign-In successful:', user);
         console.log('Profile picture URL:', payload.picture);
@@ -1687,12 +1700,24 @@ const { postSlug } = Astro.props;
     }
     
     function handleLogout() {
+      console.log('Logging out user...');
+      
       // Clear current user state
       currentUser = null;
       localStorage.removeItem('blog-user');
       
-      // Reload page to reset Google OAuth state and ensure clean sign-in
-      location.reload();
+      // Clear any Google-related cookies
+      document.cookie = 'g_state=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=' + window.location.hostname;
+      document.cookie = 'g_state=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.' + window.location.hostname;
+      
+      // Show logged out state immediately
+      showLoggedOutState();
+      hideCommentForm();
+      
+      console.log('User logged out, reloading page...');
+      
+      // Force complete page reload to reset Google OAuth
+      window.location.href = window.location.href;
     }
     
     // Global functions for reply system

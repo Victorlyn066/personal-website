@@ -822,19 +822,19 @@ const { postSlug } = Astro.props;
   }
 
   /* Mobile Responsive */
-  @media (max-width: 640px) {
+  @media (max-width: 768px) {
     .comment-item {
       padding: 1rem;
     }
     
     .comment-author-avatar {
-      width: 20px;
-      height: 20px;
+      width: 18px !important;
+      height: 18px !important;
     }
     
     .comment-author-avatar.small {
-      width: 18px;
-      height: 18px;
+      width: 16px !important;
+      height: 16px !important;
     }
     
     .comment-author {
@@ -846,8 +846,24 @@ const { postSlug } = Astro.props;
     }
     
     .reply-avatar {
-      width: 18px;
-      height: 18px;
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .comment-author-avatar {
+      width: 16px !important;
+      height: 16px !important;
+    }
+    
+    .comment-author-avatar.small {
+      width: 14px !important;
+      height: 14px !important;
+    }
+    
+    .comment-author {
+      font-size: 0.8rem;
     }
   }
 </style>
@@ -954,7 +970,12 @@ const { postSlug } = Astro.props;
         
         currentUser = user;
         localStorage.setItem('blog-user', JSON.stringify(currentUser));
-        showLoggedInState();
+        
+        // Small delay to ensure DOM is ready
+        setTimeout(() => {
+          showLoggedInState();
+          console.log('User logged in and comment form should be visible');
+        }, 100);
         
         console.log('Google Sign-In successful:', user);
         console.log('Profile picture URL:', payload.picture);
@@ -1261,6 +1282,9 @@ const { postSlug } = Astro.props;
       const userName = document.getElementById('user-name');
       
       if (userName) userName.textContent = currentUser.name;
+      
+      // Automatically show comment form for better UX
+      showCommentForm();
     }
     
     function showLoggedOutState() {
@@ -1271,10 +1295,14 @@ const { postSlug } = Astro.props;
     }
     
     function showCommentForm() {
+      console.log('showCommentForm called', { commentFormSection, addCommentBtn });
       if (commentFormSection) {
         commentFormSection.style.display = 'block';
         const textarea = document.getElementById('comment-text');
         if (textarea) textarea.focus();
+        console.log('Comment form shown successfully');
+      } else {
+        console.log('commentFormSection not found');
       }
       if (addCommentBtn) addCommentBtn.style.display = 'none';
     }

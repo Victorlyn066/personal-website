@@ -17,7 +17,7 @@ const { postSlug } = Astro.props;
     <h4>Sign in to leave a comment</h4>
     
     <!-- Google Sign In Button -->
-    <div id="google-signin-container">
+    <div id="google-signin-container" class="google-signin-centered">
       <div id="g_id_onload"
            data-client_id={GOOGLE_CONFIG.CLIENT_ID}
            data-context="signin"
@@ -49,53 +49,10 @@ const { postSlug } = Astro.props;
       </button>
     </div>
     
-    <div class="auth-divider">
-      <span>or</span>
-    </div>
-    
-    <!-- Regular Login Form -->
-    <form id="login-form" class="login-form">
-      <div class="form-group">
-        <label for="login-email">Email Address</label>
-        <input type="email" id="login-email" placeholder="Enter your email" required />
-      </div>
-      <div class="form-group">
-        <label for="login-password">Password</label>
-        <input type="password" id="login-password" placeholder="Enter your password" required />
-      </div>
-      <button type="submit" class="login-btn">Sign In</button>
-    </form>
-    
-    <div class="auth-toggle">
-      <p>Don't have an account? <button type="button" id="show-register" class="link-btn">Create one</button></p>
-    </div>
+
   </div>
 
-  <!-- Register Section (hidden initially) -->
-  <div id="register-section" class="login-section" style="display: none;">
-    <h4>Create an account</h4>
-    
-    <!-- Register Form -->
-    <form id="register-form" class="login-form">
-      <div class="form-group">
-        <label for="register-name">Full Name</label>
-        <input type="text" id="register-name" placeholder="Enter your full name" required />
-      </div>
-      <div class="form-group">
-        <label for="register-email">Email Address</label>
-        <input type="email" id="register-email" placeholder="Enter your email" required />
-      </div>
-      <div class="form-group">
-        <label for="register-password">Password</label>
-        <input type="password" id="register-password" placeholder="Create a password" required />
-      </div>
-      <button type="submit" class="login-btn">Create Account</button>
-    </form>
-    
-    <div class="auth-toggle">
-      <p>Already have an account? <button type="button" id="show-login" class="link-btn">Sign in</button></p>
-    </div>
-  </div>
+
 
   <!-- User Info Section (hidden initially) -->
   <div id="user-section" class="user-section" style="display: none;">
@@ -199,6 +156,18 @@ const { postSlug } = Astro.props;
   .google-signin-btn:active {
     transform: translateY(0);
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  .google-signin-centered {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin: 1rem 0 2rem 0;
+  }
+
+  .google-signin-centered .g_id_signin {
+    margin: 0 auto;
   }
 
   .auth-divider {

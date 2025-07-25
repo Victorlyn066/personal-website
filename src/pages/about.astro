@@ -109,6 +109,13 @@ import { SITE_TITLE } from '../consts';
          overflow-x: auto;
          padding: 0 1em;
          animation: slideInRight 0.6s ease-out 1.5s both;
+         /* Hide scrollbar for desktop */
+         scrollbar-width: none; /* Firefox */
+         -ms-overflow-style: none; /* IE and Edge */
+       }
+       
+       .section-nav::-webkit-scrollbar {
+         display: none; /* Chrome, Safari, Opera */
        }
        
        .nav-button {

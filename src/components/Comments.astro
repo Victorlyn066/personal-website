@@ -12,14 +12,50 @@ const { postSlug } = Astro.props;
   
   <!-- Login Section -->
   <div id="login-section" class="login-section">
-    <p>Enter your details to leave a comment</p>
-    <button id="google-signin-btn" class="google-signin-btn">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-        <circle cx="12" cy="7" r="4"/>
-      </svg>
-      Sign In to Comment
-    </button>
+    <h4>Sign in to leave a comment</h4>
+    
+    <!-- Login Form -->
+    <form id="login-form" class="login-form">
+      <div class="form-group">
+        <label for="login-email">Email Address</label>
+        <input type="email" id="login-email" placeholder="Enter your email" required />
+      </div>
+      <div class="form-group">
+        <label for="login-password">Password</label>
+        <input type="password" id="login-password" placeholder="Enter your password" required />
+      </div>
+      <button type="submit" class="login-btn">Sign In</button>
+    </form>
+    
+    <div class="auth-toggle">
+      <p>Don't have an account? <button type="button" id="show-register" class="link-btn">Create one</button></p>
+    </div>
+  </div>
+
+  <!-- Register Section (hidden initially) -->
+  <div id="register-section" class="login-section" style="display: none;">
+    <h4>Create an account</h4>
+    
+    <!-- Register Form -->
+    <form id="register-form" class="login-form">
+      <div class="form-group">
+        <label for="register-name">Full Name</label>
+        <input type="text" id="register-name" placeholder="Enter your full name" required />
+      </div>
+      <div class="form-group">
+        <label for="register-email">Email Address</label>
+        <input type="email" id="register-email" placeholder="Enter your email" required />
+      </div>
+      <div class="form-group">
+        <label for="register-password">Password</label>
+        <input type="password" id="register-password" placeholder="Create a password" required />
+      </div>
+      <button type="submit" class="login-btn">Create Account</button>
+    </form>
+    
+    <div class="auth-toggle">
+      <p>Already have an account? <button type="button" id="show-login" class="link-btn">Sign in</button></p>
+    </div>
   </div>
 
   <!-- User Info Section (hidden initially) -->
@@ -77,36 +113,101 @@ const { postSlug } = Astro.props;
 
   /* Login Section */
   .login-section {
-    text-align: center;
     padding: 2rem;
     background: white;
     border-radius: 8px;
     border: 1px solid #dee2e6;
+    text-align: left;
   }
 
-  .login-section p {
+  .login-section h4 {
+    margin-bottom: 1.5rem;
+    color: #333;
+    text-align: center;
+    font-size: 1.2rem;
+  }
+
+  .login-form {
+    max-width: 300px;
+    margin: 0 auto;
+  }
+
+  .form-group {
     margin-bottom: 1rem;
-    color: #666;
   }
 
-  .google-signin-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    background: white;
-    border: 2px solid #dadce0;
+  .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #333;
+    font-weight: 500;
+    font-size: 0.9rem;
+  }
+
+  .form-group input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e9ecef;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-family: inherit;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+  }
+
+  .form-group input:focus {
+    outline: none;
+    border-color: #4285f4;
+    box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+  }
+
+  .login-btn {
+    width: 100%;
+    padding: 0.75rem;
+    background: #4285f4;
+    color: white;
+    border: none;
     border-radius: 6px;
     font-size: 1rem;
     font-weight: 500;
-    color: #3c4043;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: background 0.3s ease;
+    margin-bottom: 1rem;
   }
 
-  .google-signin-btn:hover {
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    border-color: #4285f4;
+  .login-btn:hover {
+    background: #3367d6;
+  }
+
+  .auth-toggle {
+    text-align: center;
+  }
+
+  .auth-toggle p {
+    margin: 0;
+    color: #666;
+    font-size: 0.9rem;
+  }
+
+  .link-btn {
+    background: none;
+    border: none;
+    color: #4285f4;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: inherit;
+    padding: 0;
+  }
+
+  .link-btn:hover {
+    color: #3367d6;
+  }
+
+  .auth-error {
+    color: #dc3545;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    text-align: center;
   }
 
   /* User Section */
@@ -409,6 +510,21 @@ const { postSlug } = Astro.props;
     border-color: #4a5568;
   }
 
+  html.dark .login-section h4,
+  html.dark .form-group label {
+    color: #e2e8f0;
+  }
+
+  html.dark .form-group input {
+    background: #2d3748;
+    border-color: #4a5568;
+    color: #e2e8f0;
+  }
+
+  html.dark .form-group input:focus {
+    border-color: #4285f4;
+  }
+
   html.dark .login-section p,
   html.dark .comment-date,
   html.dark .no-comments {
@@ -495,14 +611,18 @@ const { postSlug } = Astro.props;
     
     // DOM elements
     const loginSection = document.getElementById('login-section');
+    const registerSection = document.getElementById('register-section');
     const userSection = document.getElementById('user-section');
     const commentFormSection = document.getElementById('comment-form-section');
     const commentsList = document.getElementById('comments-list');
     const addCommentBtn = document.getElementById('add-comment-btn');
-    const googleSigninBtn = document.getElementById('google-signin-btn');
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
     const logoutBtn = document.getElementById('logout-btn');
     const commentForm = document.getElementById('comment-form');
     const cancelCommentBtn = document.getElementById('cancel-comment-btn');
+    const showRegisterBtn = document.getElementById('show-register');
+    const showLoginBtn = document.getElementById('show-login');
     
     // Check if user is already logged in
     checkLoginStatus();
@@ -511,8 +631,20 @@ const { postSlug } = Astro.props;
     loadComments();
     
     // Event listeners
-    if (googleSigninBtn) {
-      googleSigninBtn.addEventListener('click', handleGoogleSignIn);
+    if (loginForm) {
+      loginForm.addEventListener('submit', handleLogin);
+    }
+    
+    if (registerForm) {
+      registerForm.addEventListener('submit', handleRegister);
+    }
+    
+    if (showRegisterBtn) {
+      showRegisterBtn.addEventListener('click', showRegisterForm);
+    }
+    
+    if (showLoginBtn) {
+      showLoginBtn.addEventListener('click', showLoginForm);
     }
     
     if (logoutBtn) {
@@ -541,26 +673,112 @@ const { postSlug } = Astro.props;
       }
     }
     
-    function handleGoogleSignIn() {
-      // Prompt user to enter their name and email
-      const name = prompt('Please enter your name:');
-      if (!name || name.trim() === '') return;
+    function showRegisterForm() {
+      if (loginSection) loginSection.style.display = 'none';
+      if (registerSection) registerSection.style.display = 'block';
+    }
+    
+    function showLoginForm() {
+      if (registerSection) registerSection.style.display = 'none';
+      if (loginSection) loginSection.style.display = 'block';
+    }
+    
+    function handleRegister(e: any) {
+      e.preventDefault();
       
-      const email = prompt('Please enter your email:');
-      if (!email || email.trim() === '' || !email.includes('@')) {
-        alert('Please enter a valid email address');
+      const name = (document.getElementById('register-name') as HTMLInputElement)?.value.trim();
+      const email = (document.getElementById('register-email') as HTMLInputElement)?.value.trim().toLowerCase();
+      const password = (document.getElementById('register-password') as HTMLInputElement)?.value;
+      
+      if (!name || !email || !password) {
+        showError('register-form', 'Please fill in all fields');
         return;
       }
       
+      if (!email.includes('@')) {
+        showError('register-form', 'Please enter a valid email address');
+        return;
+      }
+      
+      if (password.length < 6) {
+        showError('register-form', 'Password must be at least 6 characters');
+        return;
+      }
+      
+      // Check if user already exists
+      const existingUsers = JSON.parse(localStorage.getItem('blog-users') || '{}');
+      if (existingUsers[email]) {
+        showError('register-form', 'An account with this email already exists');
+        return;
+      }
+      
+      // Create new user
       const user = {
         id: 'user_' + Date.now(),
-        name: name.trim(),
-        email: email.trim().toLowerCase()
+        name: name,
+        email: email,
+        password: password // In real app, this would be hashed
       };
       
+      // Save to users database
+      existingUsers[email] = user;
+      localStorage.setItem('blog-users', JSON.stringify(existingUsers));
+      
+      // Log user in
       currentUser = user;
       localStorage.setItem('blog-user', JSON.stringify(currentUser));
       showLoggedInState();
+    }
+    
+    function handleLogin(e: any) {
+      e.preventDefault();
+      
+      const email = (document.getElementById('login-email') as HTMLInputElement)?.value.trim().toLowerCase();
+      const password = (document.getElementById('login-password') as HTMLInputElement)?.value;
+      
+      if (!email || !password) {
+        showError('login-form', 'Please fill in all fields');
+        return;
+      }
+      
+      // Check if user exists
+      const existingUsers = JSON.parse(localStorage.getItem('blog-users') || '{}');
+      const user = existingUsers[email];
+      
+      if (!user) {
+        showError('login-form', 'No account found with this email');
+        return;
+      }
+      
+      if (user.password !== password) {
+        showError('login-form', 'Incorrect password');
+        return;
+      }
+      
+      // Log user in
+      currentUser = user;
+      localStorage.setItem('blog-user', JSON.stringify(currentUser));
+      showLoggedInState();
+    }
+    
+    function showError(formId: string, message: string) {
+      const form = document.getElementById(formId);
+      if (!form) return;
+      
+      // Remove existing error
+      const existingError = form.querySelector('.auth-error');
+      if (existingError) existingError.remove();
+      
+      // Add new error
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'auth-error';
+      errorDiv.textContent = message;
+      form.appendChild(errorDiv);
+      
+      // Remove error after 5 seconds
+      setTimeout(() => {
+        if (errorDiv.parentNode) errorDiv.remove();
+      }, 5000);
     }
     
     function handleLogout() {
@@ -574,6 +792,7 @@ const { postSlug } = Astro.props;
       if (!currentUser) return;
       
       if (loginSection) loginSection.style.display = 'none';
+      if (registerSection) registerSection.style.display = 'none';
       if (userSection) userSection.style.display = 'block';
       if (addCommentBtn) addCommentBtn.style.display = 'block';
       
@@ -585,6 +804,7 @@ const { postSlug } = Astro.props;
     
     function showLoggedOutState() {
       if (loginSection) loginSection.style.display = 'block';
+      if (registerSection) registerSection.style.display = 'none';
       if (userSection) userSection.style.display = 'none';
       if (addCommentBtn) addCommentBtn.style.display = 'none';
     }

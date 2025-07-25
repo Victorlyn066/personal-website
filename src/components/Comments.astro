@@ -98,6 +98,7 @@ const { postSlug } = Astro.props;
 </div>
 
 <style>
+  /* Force cache refresh - 2025-01-25 20:54 */
   .comments-section {
     margin-top: 3rem;
     padding: 2rem;
@@ -621,17 +622,18 @@ const { postSlug } = Astro.props;
   }
 
   .replies-container {
-    margin-left: 40px !important;
+    margin-left: 50px !important;
     margin-top: 1rem !important;
     margin-bottom: 1rem !important;
-    border-left: 3px solid #e1e5e9 !important;
-    padding-left: 20px !important;
+    border-left: 4px solid #4285f4 !important;
+    padding-left: 25px !important;
     position: relative !important;
-    background: transparent !important;
+    background: rgba(66, 133, 244, 0.02) !important;
     padding-top: 0.5rem !important;
     padding-bottom: 0.5rem !important;
     display: block !important;
     box-sizing: border-box !important;
+    border-radius: 0 8px 8px 0 !important;
   }
 
   .replies-container::before {

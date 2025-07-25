@@ -477,8 +477,8 @@ const { postSlug } = Astro.props;
   }
 
   .comment-author-avatar {
-    width: 24px;
-    height: 24px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
     object-fit: cover;
     border: 1px solid #e5e7eb;
@@ -487,8 +487,45 @@ const { postSlug } = Astro.props;
   }
 
   .comment-author-avatar.small {
-    width: 20px;
-    height: 20px;
+    width: 16px;
+    height: 16px;
+  }
+
+  /* Specific class for header avatars with higher specificity */
+  .comment-header-avatar {
+    width: 16px !important;
+    height: 16px !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+    border: 1px solid #e5e7eb !important;
+    background: #f3f4f6 !important;
+    flex-shrink: 0 !important;
+    max-width: 16px !important;
+    max-height: 16px !important;
+  }
+
+  .comment-header-avatar.small {
+    width: 14px !important;
+    height: 14px !important;
+    max-width: 14px !important;
+    max-height: 14px !important;
+  }
+
+  /* Force override any other styles */
+  .comment-author-section img {
+    width: 16px !important;
+    height: 16px !important;
+    max-width: 16px !important;
+    max-height: 16px !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+  }
+
+  .comment-author-section img.small {
+    width: 14px !important;
+    height: 14px !important;
+    max-width: 14px !important;
+    max-height: 14px !important;
   }
 
   .comment-author {
@@ -827,14 +864,20 @@ const { postSlug } = Astro.props;
       padding: 1rem;
     }
     
-    .comment-author-avatar {
-      width: 18px !important;
-      height: 18px !important;
+    .comment-author-avatar,
+    .comment-header-avatar {
+      width: 14px !important;
+      height: 14px !important;
+      max-width: 14px !important;
+      max-height: 14px !important;
     }
     
-    .comment-author-avatar.small {
-      width: 16px !important;
-      height: 16px !important;
+    .comment-author-avatar.small,
+    .comment-header-avatar.small {
+      width: 12px !important;
+      height: 12px !important;
+      max-width: 12px !important;
+      max-height: 12px !important;
     }
     
     .comment-author {
@@ -846,20 +889,26 @@ const { postSlug } = Astro.props;
     }
     
     .reply-avatar {
-      width: 16px;
-      height: 16px;
+      width: 12px;
+      height: 12px;
     }
   }
 
   @media (max-width: 480px) {
-    .comment-author-avatar {
-      width: 16px !important;
-      height: 16px !important;
+    .comment-author-avatar,
+    .comment-header-avatar {
+      width: 12px !important;
+      height: 12px !important;
+      max-width: 12px !important;
+      max-height: 12px !important;
     }
     
-    .comment-author-avatar.small {
-      width: 14px !important;
-      height: 14px !important;
+    .comment-author-avatar.small,
+    .comment-header-avatar.small {
+      width: 10px !important;
+      height: 10px !important;
+      max-width: 10px !important;
+      max-height: 10px !important;
     }
     
     .comment-author {
@@ -1367,10 +1416,11 @@ const { postSlug } = Astro.props;
                   <div class="reply-body">
                     <div class="comment-header">
                       <div class="comment-author-section">
-                        <img src="${reply.userPicture && reply.userPicture !== 'undefined' ? reply.userPicture : `https://ui-avatars.com/api/?name=${encodeURIComponent(reply.author)}&background=4285f4&color=fff&size=20`}" 
+                        <img src="${reply.userPicture && reply.userPicture !== 'undefined' ? reply.userPicture : `https://ui-avatars.com/api/?name=${encodeURIComponent(reply.author)}&background=4285f4&color=fff&size=14`}" 
                              alt="${reply.author}" 
-                             class="comment-author-avatar small"
-                             onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(reply.author)}&background=4285f4&color=fff&size=20'" />
+                             class="comment-header-avatar small"
+                             style="width: 14px !important; height: 14px !important; max-width: 14px !important; max-height: 14px !important; border-radius: 50%; object-fit: cover; flex-shrink: 0;"
+                             onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(reply.author)}&background=4285f4&color=fff&size=14'" />
                         <span class="comment-author">${reply.author}</span>
                       </div>
                       <span class="comment-date">${formatDate(reply.date)}</span>
@@ -1388,10 +1438,11 @@ const { postSlug } = Astro.props;
                 <div class="comment-body">
                 <div class="comment-header">
                   <div class="comment-author-section">
-                    <img src="${comment.userPicture && comment.userPicture !== 'undefined' ? comment.userPicture : `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.author)}&background=4285f4&color=fff&size=24`}" 
+                    <img src="${comment.userPicture && comment.userPicture !== 'undefined' ? comment.userPicture : `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.author)}&background=4285f4&color=fff&size=16`}" 
                          alt="${comment.author}" 
-                         class="comment-author-avatar"
-                         onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(comment.author)}&background=4285f4&color=fff&size=24'" />
+                         class="comment-header-avatar"
+                         style="width: 16px !important; height: 16px !important; max-width: 16px !important; max-height: 16px !important; border-radius: 50%; object-fit: cover; flex-shrink: 0;"
+                         onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(comment.author)}&background=4285f4&color=fff&size=16'" />
                     <span class="comment-author">${comment.author}</span>
                   </div>
                   <span class="comment-date">${formatDate(comment.date)}</span>

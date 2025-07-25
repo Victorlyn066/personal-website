@@ -10,7 +10,13 @@ const { postSlug } = Astro.props;
 ---
 
 <div class="comments-section" id="comments-section" data-post-slug={postSlug}>
+  <div class="comments-header">
   <h3>Comments</h3>
+  <div class="storage-info">
+    <span class="storage-notice">💾 Comments stored locally</span>
+    <button id="storage-info-btn" class="info-btn" title="Learn about comment storage">ℹ️</button>
+  </div>
+</div>
   
   <!-- Login Section -->
   <div id="login-section" class="login-section">
@@ -100,11 +106,55 @@ const { postSlug } = Astro.props;
     border: 1px solid #e9ecef;
   }
 
-  .comments-section h3 {
+  .comments-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .comments-section h3 {
+    margin: 0;
     color: #333;
     font-size: 1.5rem;
     font-weight: 600;
+  }
+
+  .storage-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .storage-notice {
+    font-size: 0.875rem;
+    color: #6c757d;
+    background: #f8f9fa;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    border: 1px solid #dee2e6;
+  }
+
+  .info-btn {
+    background: #4285f4;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+  }
+
+  .info-btn:hover {
+    background: #3367d6;
+    transform: scale(1.1);
   }
 
   /* Login Section */
@@ -824,6 +874,12 @@ const { postSlug } = Astro.props;
     
     // Load comments for this post
     loadComments();
+
+    // Handle storage info button
+    const storageInfoBtn = document.getElementById('storage-info-btn');
+    if (storageInfoBtn) {
+      storageInfoBtn.addEventListener('click', showStorageInfoModal);
+    }
     
     // Event listeners
     if (loginForm) {
@@ -892,6 +948,7 @@ const { postSlug } = Astro.props;
         showLoggedInState();
         
         console.log('Google Sign-In successful:', user);
+        console.log('Profile picture URL:', payload.picture);
       } catch (error) {
         console.error('Error processing Google Sign-In:', error);
                            console.error('Failed to sign in with Google. Please try again.');
@@ -1271,7 +1328,7 @@ const { postSlug } = Astro.props;
             ${comment.replies.map((reply: any) => `
               <div class="reply-item">
                 <div class="reply-avatar">
-                  <img src="${reply.userPicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(reply.author)}&background=4285f4&color=fff&size=32`}" 
+                  <img src="${reply.userPicture && reply.userPicture !== 'undefined' ? reply.userPicture : `https://ui-avatars.com/api/?name=${encodeURIComponent(reply.author)}&background=4285f4&color=fff&size=32`}" 
                        alt="${reply.author}" 
                        class="avatar-img small"
                        onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(reply.author)}&background=4285f4&color=fff&size=32'" />
@@ -1292,7 +1349,7 @@ const { postSlug } = Astro.props;
           <div class="comment-thread">
             <div class="comment-item comment-main" data-comment-id="${comment.id}">
               <div class="comment-avatar">
-                <img src="${comment.userPicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.author)}&background=4285f4&color=fff&size=40`}" 
+                <img src="${comment.userPicture && comment.userPicture !== 'undefined' ? comment.userPicture : `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.author)}&background=4285f4&color=fff&size=40`}" 
                      alt="${comment.author}" 
                      class="avatar-img"
                      onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(comment.author)}&background=4285f4&color=fff&size=40'" />
@@ -1362,6 +1419,160 @@ const { postSlug } = Astro.props;
         if (textarea) textarea.value = '';
       }
     };
+
+    function showStorageInfoModal() {
+      const modal = createStorageInfoModal();
+      document.body.appendChild(modal);
+    }
+
+    function createStorageInfoModal() {
+      const modal = document.createElement('div');
+      modal.innerHTML = `
+        <div class="storage-modal-overlay">
+          <div class="storage-modal">
+            <div class="storage-modal-header">
+              <h3>💾 Comment Storage Information</h3>
+              <button class="storage-modal-close">&times;</button>
+            </div>
+            <div class="storage-modal-body">
+              <div class="storage-info-section">
+                <h4>📱 Current Setup</h4>
+                <p>Comments are currently stored locally on your device using browser storage. This means:</p>
+                <ul>
+                  <li>✅ Your comments are saved instantly</li>
+                  <li>❌ Only you can see your comments on this device</li>
+                  <li>❌ Comments don't sync across devices</li>
+                  <li>❌ Other visitors can't see your comments</li>
+                </ul>
+              </div>
+              
+              <div class="storage-info-section">
+                <h4>🌐 For Shared Comments</h4>
+                <p>To enable comments visible to all users, a backend database would be needed. This requires:</p>
+                <ul>
+                  <li>🗄️ Database setup (Firebase, Supabase, etc.)</li>
+                  <li>🔧 Server configuration</li>
+                  <li>💰 Hosting costs for storage</li>
+                </ul>
+              </div>
+              
+              <div class="storage-info-section">
+                <h4>🔮 Future Enhancement</h4>
+                <p>This can be upgraded to a shared comment system. For now, enjoy testing the Google OAuth and beautiful UI!</p>
+              </div>
+              
+              <button class="storage-modal-ok">Got it!</button>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      // Add styles
+      const style = document.createElement('style');
+             style.textContent = `
+        .storage-modal-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          background: rgba(0,0,0,0.5);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 10000;
+        }
+        .storage-modal {
+          background: white;
+          border-radius: 12px;
+          width: 500px;
+          max-width: 90vw;
+          max-height: 80vh;
+          overflow-y: auto;
+          box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        .storage-modal-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 1.5rem;
+          border-bottom: 1px solid #e9ecef;
+          background: linear-gradient(135deg, #4285f4, #34a853);
+          color: white;
+          border-radius: 12px 12px 0 0;
+        }
+        .storage-modal-header h3 {
+          margin: 0;
+          font-size: 1.25rem;
+        }
+        .storage-modal-close {
+          background: none;
+          border: none;
+          color: white;
+          font-size: 24px;
+          cursor: pointer;
+          opacity: 0.8;
+          transition: opacity 0.2s;
+        }
+        .storage-modal-close:hover {
+          opacity: 1;
+        }
+        .storage-modal-body {
+          padding: 1.5rem;
+        }
+        .storage-info-section {
+          margin-bottom: 1.5rem;
+        }
+        .storage-info-section h4 {
+          color: #333;
+          margin: 0 0 0.5rem 0;
+          font-size: 1.1rem;
+        }
+        .storage-info-section p {
+          color: #666;
+          margin: 0 0 0.75rem 0;
+          line-height: 1.5;
+        }
+        .storage-info-section ul {
+          margin: 0;
+          padding-left: 1.5rem;
+        }
+        .storage-info-section li {
+          color: #666;
+          margin-bottom: 0.5rem;
+          line-height: 1.4;
+        }
+        .storage-modal-ok {
+          width: 100%;
+          padding: 0.75rem;
+          background: #4285f4;
+          color: white;
+          border: none;
+          border-radius: 6px;
+          font-size: 1rem;
+          font-weight: 500;
+          cursor: pointer;
+          transition: background 0.2s;
+        }
+        .storage-modal-ok:hover {
+          background: #3367d6;
+                 }
+       `;
+      modal.appendChild(style);
+      
+      // Add event listeners
+      const closeBtn = modal.querySelector('.storage-modal-close');
+      const okBtn = modal.querySelector('.storage-modal-ok');
+      const overlay = modal.querySelector('.storage-modal-overlay');
+      
+      closeBtn?.addEventListener('click', () => modal.remove());
+      okBtn?.addEventListener('click', () => modal.remove());
+      overlay?.addEventListener('click', (e) => {
+        if (e.target === overlay) modal.remove();
+      });
+      
+      return modal;
+    }
     
     (window as any).submitReply = function(commentId: string) {
       if (!currentUser) return;

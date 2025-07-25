@@ -1132,9 +1132,19 @@ const { postSlug } = Astro.props;
     
     // Check if we just refreshed from logout
     const logoutRefresh = localStorage.getItem('oauth-logout-refresh');
-    if (logoutRefresh) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const hasRefreshParams = urlParams.has('_t') && urlParams.has('_r');
+    
+    if (logoutRefresh || hasRefreshParams) {
       localStorage.removeItem('oauth-logout-refresh');
-      console.log('✅ Page refreshed after logout - OAuth state should be clean');
+      console.log('✅ HARD refresh completed after logout - OAuth state is clean!');
+      
+      // Clean up URL if it has refresh parameters
+      if (hasRefreshParams) {
+        const cleanUrl = window.location.pathname;
+        window.history.replaceState({}, document.title, cleanUrl);
+        console.log('✅ Cleaned up refresh parameters from URL');
+      }
     }
     
     // Check if user is already logged in
@@ -1843,23 +1853,48 @@ const { postSlug } = Astro.props;
       hideCommentForm();
       console.log('✅ Updated UI to logged out state');
       
-      // Set a logout flag and perform a hard refresh
+      // Set a logout flag and perform a HARD refresh with cache bypass
       localStorage.setItem('oauth-logout-refresh', 'true');
       
+      // Show user feedback
+      const userSection = document.getElementById('user-section');
+      if (userSection) {
+        userSection.innerHTML = '<div style="color: #666; font-style: italic;">Refreshing page...</div>';
+      }
+      
       setTimeout(() => {
-        console.log('Performing hard refresh to reset OAuth state...');
+        console.log('Performing HARD refresh (Cmd+Shift+R equivalent)...');
         
-        // Method 1: Try using meta refresh for hard reload
-        const meta = document.createElement('meta');
-        meta.httpEquiv = 'refresh';
-        meta.content = '0';
-        document.head.appendChild(meta);
+        // Force a hard refresh by manipulating browser cache headers
+        if ('serviceWorker' in navigator) {
+          // Clear service worker cache if it exists
+          navigator.serviceWorker.getRegistrations().then(registrations => {
+            registrations.forEach(registration => registration.unregister());
+          });
+        }
         
-        // Method 2: Fallback to location href replacement
-        setTimeout(() => {
-          window.location.href = window.location.href;
-        }, 100);
-      }, 300);
+        // Clear all possible browser storage
+        try {
+          sessionStorage.clear();
+          // Clear specific caches if available
+          if ('caches' in window) {
+            caches.keys().then(names => {
+              names.forEach(name => caches.delete(name));
+            });
+          }
+        } catch (e) {
+          console.log('Could not clear some caches:', e);
+        }
+        
+        // Method 1: Force reload with cache bypass using location.replace
+        const url = new URL(window.location.href);
+        url.searchParams.set('_t', Date.now().toString());
+        url.searchParams.set('_r', Math.random().toString());
+        
+        // Use location.replace to force a true navigation (not just refresh)
+        window.location.replace(url.toString());
+        
+      }, 200);
       
       console.log('=== LOGOUT PROCESS COMPLETE ===');
     }

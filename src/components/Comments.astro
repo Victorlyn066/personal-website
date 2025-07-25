@@ -1135,6 +1135,11 @@ const { postSlug } = Astro.props;
     
     // Load comments for this post
     loadComments();
+    
+    // Initialize Google OAuth after a delay to ensure API is loaded
+    setTimeout(() => {
+      initializeGoogleOAuth();
+    }, 1500);
 
     // Handle storage info button
     const storageInfoBtn = document.getElementById('storage-info-btn');
@@ -1593,16 +1598,16 @@ const { postSlug } = Astro.props;
     }
     
     function showLoggedOutState() {
-      console.log('Showing logged out state');
+      console.log('=== SHOWING LOGGED OUT STATE ===');
       
       if (loginSection) {
         loginSection.style.display = 'block';
-        console.log('Login section shown');
+        console.log('✅ Login section shown');
       }
       if (registerSection) registerSection.style.display = 'none';
       if (userSection) {
         userSection.style.display = 'none';
-        console.log('User section hidden');
+        console.log('✅ User section hidden');
       }
       if (addCommentBtn) addCommentBtn.style.display = 'none';
       
@@ -1610,11 +1615,14 @@ const { postSlug } = Astro.props;
       const googleContainer = document.getElementById('google-signin-container');
       if (googleContainer) {
         googleContainer.style.display = 'flex';
-        console.log('Google sign-in container shown');
+        console.log('✅ Google sign-in container shown');
       }
       
       // Reload comments to hide reply buttons
+      console.log('Reloading comments for logged out state...');
       loadComments();
+      
+      console.log('=== LOGGED OUT STATE COMPLETE ===');
     }
     
     function showCommentForm() {
@@ -1746,18 +1754,104 @@ const { postSlug } = Astro.props;
     }
     
     function handleLogout() {
-      console.log('Logging out user...');
+      console.log('=== STARTING LOGOUT PROCESS ===');
+      
+      // Store current user for Google revoke
+      const userEmail = currentUser?.email;
+      console.log('User email for revoke:', userEmail);
       
       // Clear current user state
       currentUser = null;
       localStorage.removeItem('blog-user');
-      
-      // Clear any other user-related storage
       localStorage.removeItem('blog-users');
+      console.log('✅ Cleared local storage');
       
-      // Simple approach: just reload the page completely
-      console.log('Performing complete page reload...');
-      window.location.reload();
+      // Properly revoke Google OAuth access
+      if (userEmail && (window as any).google?.accounts?.id) {
+        console.log('Attempting to revoke Google access...');
+        try {
+          // Disable auto-select to prevent automatic re-login
+          (window as any).google.accounts.id.disableAutoSelect();
+          console.log('✅ Disabled Google auto-select');
+          
+          // Revoke the user's access
+          (window as any).google.accounts.id.revoke(userEmail, (response: any) => {
+            console.log('Google revoke response:', response);
+          });
+          console.log('✅ Revoked Google access');
+        } catch (error) {
+          console.error('❌ Error revoking Google access:', error);
+        }
+      }
+      
+      // Clear Google cookies
+      const googleCookies = ['g_state', 'g_csrf_token'];
+      googleCookies.forEach(cookie => {
+        document.cookie = `${cookie}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+        document.cookie = `${cookie}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${window.location.hostname};`;
+        document.cookie = `${cookie}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.${window.location.hostname};`;
+      });
+      console.log('✅ Cleared Google cookies');
+      
+      // Show logged out state
+      showLoggedOutState();
+      hideCommentForm();
+      console.log('✅ Updated UI to logged out state');
+      
+      // Reinitialize Google OAuth after a short delay
+      setTimeout(() => {
+        console.log('Reinitializing Google OAuth...');
+        initializeGoogleOAuth();
+      }, 1000);
+      
+      console.log('=== LOGOUT PROCESS COMPLETE ===');
+    }
+    
+    function initializeGoogleOAuth() {
+      console.log('=== INITIALIZING GOOGLE OAUTH ===');
+      
+      if (!(window as any).google?.accounts?.id) {
+        console.log('❌ Google accounts API not loaded yet, retrying...');
+        setTimeout(initializeGoogleOAuth, 500);
+        return;
+      }
+      
+      try {
+        // Initialize Google OAuth  
+        (window as any).google.accounts.id.initialize({
+          client_id: '175048817524-o1dvmrsjvskvtth2vdno9dn28h3fkpjr.apps.googleusercontent.com',
+          callback: handleCredentialResponse,
+          auto_select: false,
+          cancel_on_tap_outside: false
+        });
+        
+        // Render the sign-in button
+        const signInContainer = document.querySelector('.g_id_signin');
+        if (signInContainer) {
+          (window as any).google.accounts.id.renderButton(signInContainer, {
+            type: 'standard',
+            shape: 'rectangular',
+            theme: 'outline',
+            text: 'signin_with',
+            size: 'large',
+            logo_alignment: 'left'
+          });
+          console.log('✅ Google sign-in button rendered');
+        }
+        
+        // Show the Google container
+        const googleContainer = document.getElementById('google-signin-container');
+        if (googleContainer) {
+          googleContainer.style.display = 'flex';
+          console.log('✅ Google container shown');
+        }
+        
+        console.log('✅ Google OAuth initialized successfully');
+      } catch (error) {
+        console.error('❌ Error initializing Google OAuth:', error);
+      }
+      
+      console.log('=== GOOGLE OAUTH INITIALIZATION COMPLETE ===');
     }
     
     // Global functions for reply system

@@ -449,7 +449,7 @@ const { postSlug } = Astro.props;
     background: white;
     padding: 1.25rem;
     border-radius: 12px;
-    border: 1px solid #e5e7eb;
+    border: none;
     margin-bottom: 1.5rem;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     transition: all 0.2s ease;
@@ -457,7 +457,6 @@ const { postSlug } = Astro.props;
 
   .comment-item:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    border-color: #d1d5db;
   }
 
   .comment-body {
@@ -579,7 +578,7 @@ const { postSlug } = Astro.props;
     padding: 0.5rem 0.9rem;
     background: rgba(255, 255, 255, 0.1);
     color: #9ca3af;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: none;
     border-radius: 20px;
     font-size: 0.85rem;
     cursor: pointer;
@@ -592,7 +591,6 @@ const { postSlug } = Astro.props;
   .reply-btn:hover {
     background: rgba(255, 255, 255, 0.15);
     color: #e5e7eb;
-    border-color: rgba(255, 255, 255, 0.3);
     transform: translateY(-1px);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   }
@@ -636,7 +634,7 @@ const { postSlug } = Astro.props;
     padding: 1rem;
     border-radius: 12px;
     margin-bottom: 0.75rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: none;
     position: relative;
     transition: all 0.2s ease;
     backdrop-filter: blur(10px);
@@ -646,7 +644,6 @@ const { postSlug } = Astro.props;
 
   .reply-item:hover {
     background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.2);
     transform: translateY(-1px);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
@@ -672,20 +669,19 @@ const { postSlug } = Astro.props;
     padding: 1.2rem;
     background: rgba(255, 255, 255, 0.05);
     border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: none;
     backdrop-filter: blur(10px);
     box-shadow: none;
     transition: all 0.3s ease;
   }
 
   .reply-form:hover {
-    border-color: rgba(255, 255, 255, 0.2);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 
   .reply-form textarea {
     width: 100%;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: none;
     border-radius: 12px;
     padding: 1rem;
     font-size: 0.95rem;
@@ -701,7 +697,6 @@ const { postSlug } = Astro.props;
 
   .reply-form textarea:focus {
     outline: none;
-    border-color: rgba(255, 255, 255, 0.3);
     box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
     background: rgba(255, 255, 255, 0.12);
     transform: scale(1.005);
@@ -768,7 +763,21 @@ const { postSlug } = Astro.props;
   html.dark .comment-item,
   html.dark .no-comments {
     background: #1a202c;
-    border-color: #4a5568;
+    border: none !important;
+  }
+
+  /* Force remove all borders in dark mode */
+  html.dark .comment-item,
+  html.dark .comment-item:hover,
+  html.dark .reply-item,
+  html.dark .reply-item:hover,
+  html.dark .reply-form,
+  html.dark .reply-form:hover,
+  html.dark .comment-form,
+  html.dark .comment-form:hover {
+    border: none !important;
+    border-color: transparent !important;
+    border-width: 0 !important;
   }
 
   html.dark .login-section h4,
@@ -800,23 +809,26 @@ const { postSlug } = Astro.props;
   html.dark .comment-form textarea,
   html.dark .reply-form textarea {
     background: #2d3748;
-    border-color: #4a5568;
+    border: none !important;
     color: #e2e8f0;
   }
 
   html.dark .comment-form textarea:focus,
   html.dark .reply-form textarea:focus {
-    border-color: #4285f4;
+    border: none !important;
+    border-color: transparent !important;
+    border-width: 0 !important;
+    box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.3);
   }
 
   html.dark .reply-item {
     background: #2d3748;
-    border-color: #4a5568;
+    border: none !important;
   }
 
   html.dark .reply-form {
     background: #2d3748;
-    border-color: #4a5568;
+    border: none !important;
   }
 
   html.dark .replies-container {
@@ -944,22 +956,28 @@ const { postSlug } = Astro.props;
     }
 
     .replies-container {
-      margin-left: 25px !important;
-      padding-left: 15px !important;
+      margin-left: 15px !important;
+      padding-left: 10px !important;
     }
 
     .reply-item::before {
-      left: -25px !important;
-      font-size: 14px !important;
+      left: -20px !important;
+      font-size: 12px !important;
     }
 
     .reply-form {
-      padding: 1rem !important;
+      padding: 0.75rem !important;
     }
 
     .reply-form textarea {
-      padding: 0.75rem !important;
-      min-height: 80px !important;
+      padding: 0.5rem !important;
+      min-height: 70px !important;
+      font-size: 0.9rem !important;
+    }
+
+    .reply-btn {
+      padding: 0.4rem 0.7rem !important;
+      font-size: 0.8rem !important;
     }
   }
 
@@ -983,6 +1001,36 @@ const { postSlug } = Astro.props;
     .comment-author {
       font-size: 0.8rem;
     }
+  }
+
+  /* AGGRESSIVE BORDER REMOVAL FOR DARK MODE - HIGHEST PRIORITY */
+  html.dark .comments-section .comment-item,
+  html.dark .comments-section .reply-item,
+  html.dark .comments-section .reply-form,
+  html.dark .comments-section .comment-form,
+  html.dark .comments-section textarea,
+  html.dark .comments-section .reply-btn {
+    border: none !important;
+    border-color: transparent !important;
+    border-width: 0px !important;
+    border-style: none !important;
+  }
+
+  /* Fix Google sign-in button in dark mode */
+  html.dark .google-signin-btn {
+    background: #4285f4 !important;
+    color: white !important;
+    border: none !important;
+  }
+
+  html.dark .google-signin-btn:hover {
+    background: #3367d6 !important;
+    color: white !important;
+  }
+
+  /* Ensure login section text is readable in dark mode */
+  html.dark .login-section h4 {
+    color: #e2e8f0 !important;
   }
 </style>
 
@@ -1389,20 +1437,48 @@ const { postSlug } = Astro.props;
     }
     
     function showLoggedInState() {
-      if (!currentUser) return;
+      if (!currentUser) {
+        console.error('showLoggedInState called but no currentUser');
+        return;
+      }
       
-      if (loginSection) loginSection.style.display = 'none';
+      console.log('showLoggedInState called with user:', currentUser);
+      
+      if (loginSection) {
+        loginSection.style.display = 'none';
+        console.log('Login section hidden');
+      } else {
+        console.error('loginSection not found');
+      }
+      
       if (registerSection) registerSection.style.display = 'none';
-      if (userSection) userSection.style.display = 'block';
-      if (addCommentBtn) addCommentBtn.style.display = 'block';
+      if (userSection) {
+        userSection.style.display = 'block';
+        console.log('User section shown');
+      } else {
+        console.error('userSection not found');
+      }
+      
+      if (addCommentBtn) {
+        addCommentBtn.style.display = 'block';
+        console.log('Add comment button shown');
+      } else {
+        console.error('addCommentBtn not found');
+      }
       
       // Update user info
       const userName = document.getElementById('user-name');
-      
-      if (userName) userName.textContent = currentUser.name;
+      if (userName) {
+        userName.textContent = currentUser.name;
+        console.log('User name updated to:', currentUser.name);
+      } else {
+        console.error('userName element not found');
+      }
       
       // Automatically show comment form for better UX
-      showCommentForm();
+      setTimeout(() => {
+        showCommentForm();
+      }, 200);
     }
     
     function showLoggedOutState() {
@@ -1413,11 +1489,21 @@ const { postSlug } = Astro.props;
     }
     
     function showCommentForm() {
-      console.log('showCommentForm called', { commentFormSection, addCommentBtn });
+      console.log('showCommentForm called');
+      console.log('commentFormSection:', commentFormSection);
+      console.log('currentUser:', currentUser);
+      
       if (commentFormSection) {
         commentFormSection.style.display = 'block';
+        console.log('Comment form section display set to block');
+        
         const textarea = document.getElementById('comment-text');
-        if (textarea) textarea.focus();
+        if (textarea) {
+          textarea.focus();
+          console.log('Textarea focused');
+        } else {
+          console.error('Textarea with id "comment-text" not found');
+        }
         console.log('Comment form shown successfully');
       } else {
         console.log('commentFormSection not found');
@@ -1477,37 +1563,75 @@ const { postSlug } = Astro.props;
         return;
       }
       
-      commentsList.innerHTML = comments.map((comment: any) => {
-        const repliesHtml = (comment.replies && comment.replies.length > 0) ? `
-          <div class="replies-container" style="margin-left: 50px !important; background: rgba(255, 255, 255, 0.02) !important; border-left: 3px solid rgba(156, 163, 175, 0.4) !important; padding: 1.2rem !important; border-radius: 0 12px 12px 0 !important; box-shadow: none !important;">
-            ${comment.replies.map((reply: any) => `
-                              <div class="reply-item">
-                  <div class="reply-body">
-                    <div class="comment-header">
-                      <div class="comment-author-section">
-                        <img src="${reply.userPicture && reply.userPicture !== 'undefined' ? reply.userPicture : `https://ui-avatars.com/api/?name=${encodeURIComponent(reply.author)}&background=4285f4&color=fff&size=14`}" 
-                             alt="${reply.author}" 
-                             class="comment-header-avatar small"
-                             style="width: 14px !important; height: 14px !important; max-width: 14px !important; max-height: 14px !important; border-radius: 50%; object-fit: cover; flex-shrink: 0;"
-                             onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(reply.author)}&background=4285f4&color=fff&size=14'" />
-                        <span class="comment-author">${reply.author}</span>
-                      </div>
-                      <span class="comment-date">${formatDate(reply.date)}</span>
+      // Recursive function to render replies with infinite nesting
+      function renderReplies(replies: any[], depth = 0): string {
+        if (!replies || replies.length === 0) return '';
+        
+        const marginLeft = Math.max(20, 50 - (depth * 6)); // Decrease margin for deeper nesting
+        const paddingLeft = Math.max(10, 25 - (depth * 2)); // Decrease padding for deeper nesting
+        const borderWidth = Math.max(1, 4 - depth); // Thinner borders for deeper levels
+        const bgOpacity = Math.max(0.005, 0.02 - depth * 0.003); // Fade background for deeper levels
+        const borderOpacity = Math.max(0.15, 0.4 - depth * 0.04); // Fade borders for deeper levels
+        
+        // Different border colors for different depths
+        const borderColors = [
+          'rgba(156, 163, 175, 0.4)', // Level 0 - Gray
+          'rgba(59, 130, 246, 0.4)',  // Level 1 - Blue  
+          'rgba(16, 185, 129, 0.4)',  // Level 2 - Green
+          'rgba(245, 101, 101, 0.4)', // Level 3 - Red
+          'rgba(139, 92, 246, 0.4)',  // Level 4 - Purple
+          'rgba(245, 158, 11, 0.4)'   // Level 5+ - Orange
+        ];
+        const borderColor = borderColors[Math.min(depth, borderColors.length - 1)];
+        
+        return `
+          <div class="replies-container" style="margin-left: ${marginLeft}px !important; background: rgba(255, 255, 255, ${bgOpacity}) !important; border-left: ${borderWidth}px solid ${borderColor} !important; padding: ${paddingLeft}px !important; border-radius: 0 ${Math.max(6, 12 - depth)}px ${Math.max(6, 12 - depth)}px 0 !important; box-shadow: none !important;">
+            ${replies.map((reply: any) => `
+              <div class="reply-item">
+                <div class="reply-body">
+                  <div class="comment-header">
+                    <div class="comment-author-section">
+                      <img src="${reply.userPicture && reply.userPicture !== 'undefined' ? reply.userPicture : `https://ui-avatars.com/api/?name=${encodeURIComponent(reply.author)}&background=4285f4&color=fff&size=14`}" 
+                           alt="${reply.author}" 
+                           class="comment-header-avatar small"
+                           style="width: 14px !important; height: 14px !important; max-width: 14px !important; max-height: 14px !important; border-radius: 50%; object-fit: cover; flex-shrink: 0;"
+                           onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(reply.author)}&background=4285f4&color=fff&size=14'" />
+                      <span class="comment-author">${reply.author}</span>
                     </div>
+                    <span class="comment-date">${formatDate(reply.date)}</span>
+                  </div>
                   <div class="comment-content">${reply.content}</div>
                   <div class="comment-actions" style="margin-top: 0.75rem;">
-                    ${currentUser ? `<button class="reply-btn" onclick="showReplyForm('${reply.id}', '${comment.id}')">
+                    ${currentUser ? `<button class="reply-btn" onclick="showReplyForm('${reply.id}')">
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/>
                       </svg>
                       Reply
                     </button>` : ''}
                   </div>
+                  <div id="reply-form-${reply.id}" class="reply-form" style="display: none;">
+                    <div class="reply-form-header">
+                      <img src="${currentUser?.picture || `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser?.name || 'User')}&background=4285f4&color=fff&size=32`}" 
+                           alt="${currentUser?.name || 'User'}" 
+                           class="reply-avatar" />
+                      <span class="reply-as">Replying to ${reply.author}</span>
+                    </div>
+                    <textarea placeholder="Write a thoughtful reply..." rows="3"></textarea>
+                    <div class="reply-actions">
+                      <button class="submit-reply-btn" onclick="submitReply('${reply.id}')">Post Reply</button>
+                      <button class="cancel-reply-btn" onclick="hideReplyForm('${reply.id}')">Cancel</button>
+                    </div>
+                  </div>
                 </div>
+                ${renderReplies(reply.replies, depth + 1)}
               </div>
             `).join('')}
           </div>
-        ` : '';
+        `;
+      }
+
+      commentsList.innerHTML = comments.map((comment: any) => {
+        const repliesHtml = renderReplies(comment.replies, 0);
         
                 return `
           <div class="comment-thread">
@@ -1749,39 +1873,54 @@ const { postSlug } = Astro.props;
       console.log('Comments cleared for testing');
     };
 
-    (window as any).submitReply = function(commentId: string) {
+    // Recursive function to find and add reply to nested comments
+    function addReplyToComment(comments: any[], parentId: string, reply: any): boolean {
+      for (let comment of comments) {
+        // Check if this is the parent comment
+        if (comment.id === parentId) {
+          if (!comment.replies) comment.replies = [];
+          comment.replies.push(reply);
+          return true;
+        }
+        
+        // Recursively check in replies
+        if (comment.replies && comment.replies.length > 0) {
+          if (addReplyToComment(comment.replies, parentId, reply)) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    (window as any).submitReply = function(parentId: string) {
       if (!currentUser) return;
       
-      const replyForm = document.getElementById(`reply-form-${commentId}`);
+      const replyForm = document.getElementById(`reply-form-${parentId}`);
       const textarea = replyForm?.querySelector('textarea') as HTMLTextAreaElement;
       const replyText = textarea?.value.trim();
       
       if (!replyText) return;
       
       const reply = {
-        id: 'reply_' + Date.now(),
+        id: 'reply_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
         author: currentUser.name,
         content: replyText,
         date: new Date().toISOString(),
         timestamp: Date.now(),
-        userPicture: currentUser.picture
+        userPicture: currentUser.picture,
+        replies: [] // Initialize empty replies array for infinite nesting
       };
       
       const commentsKey = `comments_${postSlug}`;
       let comments = JSON.parse(localStorage.getItem(commentsKey) || '[]');
       
-      // Find the parent comment and add the reply
-      comments = comments.map((comment: any) => {
-        if (comment.id === commentId) {
-          if (!comment.replies) comment.replies = [];
-          comment.replies.push(reply);
-        }
-        return comment;
-      });
+      // Add reply to the correct parent (could be deep in the tree)
+      addReplyToComment(comments, parentId, reply);
       
       localStorage.setItem(commentsKey, JSON.stringify(comments));
       loadComments();
-      (window as any).hideReplyForm(commentId);
+      (window as any).hideReplyForm(parentId);
     };
   });
 </script> 

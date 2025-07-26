@@ -1,5 +1,5 @@
 # Astro Starter Kit: Blog 
-<!-- Deploy trigger - ca27f89 -->
+<!-- Deploy trigger - Supabase permanent storage deployed -->
 
 ```sh
 npm create astro@latest -- --template blog

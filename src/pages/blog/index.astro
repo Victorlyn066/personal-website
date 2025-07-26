@@ -505,7 +505,7 @@ const posts = (await getCollection('blog')).sort(
 					{
 						posts.map((post) => (
 							<li data-title={post.data.title.toLowerCase()} data-description={post.data.description?.toLowerCase() || ''}>
-								<a href={`/blog/${post.id}/`}>
+								<a href={`/blog/${post.data.slug}/`}>
 									{post.data.heroImage && (
 										<Image width={720} height={360} src={post.data.heroImage} alt="" />
 									)}
@@ -514,7 +514,7 @@ const posts = (await getCollection('blog')).sort(
 										<FormattedDate date={post.data.pubDate} />
 									</p>
 									<div class="post-likes">
-										<LikeButton postId={post.id} size="small" />
+										<LikeButton postId={post.data.slug} size="small" />
 									</div>
 								</a>
 							</li>

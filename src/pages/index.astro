@@ -707,10 +707,10 @@ const posts = (await getCollection('blog')).sort(
                       <span class="post-month-year">{post.data.pubDate.toLocaleString('default', { month: 'short' })} {post.data.pubDate.getFullYear()}</span>
                     </div>
                     <div class="post-content">
-                      <a href={`/blog/${post.id}/`} class="post-title">{post.data.title}</a>
+                      <a href={`/blog/${post.data.slug}/`} class="post-title">{post.data.title}</a>
                       <div class="post-desc">{post.data.description || ''}</div>
                       <div class="post-meta">
-                        <LikeButton postId={post.id} size="small" />
+                        <LikeButton postId={post.data.slug} size="small" />
                       </div>
                     </div>
                   </li>

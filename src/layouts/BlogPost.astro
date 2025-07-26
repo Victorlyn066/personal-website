@@ -11,10 +11,10 @@ import { Image } from 'astro:assets';
 
 type Props = CollectionEntry<'blog'>['data'];
 
-const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+const { title, description, pubDate, updatedDate, heroImage, slug } = Astro.props;
 
-// Generate a unique post ID from the URL
-const postId = Astro.url.pathname.replace(/^\/blog\//, '').replace(/\/$/, '');
+// Use the custom slug as the post ID
+const postId = slug;
 ---
 
 <html lang="en">

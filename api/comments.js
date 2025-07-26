@@ -206,26 +206,68 @@ export default async function handler(req, res) {
           if (supabase) {
             console.log('💾 Adding reply to Supabase database...');
             
-            // Get the parent comment from database
-            const { data: parentComment, error: fetchError } = await supabase
+            // Get all comments for this post
+            const { data: allComments, error: fetchError } = await supabase
               .from('comments')
               .select('*')
-              .eq('id', parentCommentId)
-              .single();
+              .eq('post_slug', postSlug)
+              .order('created_at', { ascending: false });
             
-            if (fetchError || !parentComment) {
-              console.log('4. ERROR - Parent comment not found in database');
-              return res.status(404).json({ error: 'Parent comment not found' });
+            if (fetchError) {
+              throw fetchError;
             }
             
-            // Add reply to existing replies
-            const updatedReplies = [...(parentComment.replies || []), newReply];
+            // Function to find and update the target comment/reply recursively
+            function addReplyToTarget(comments, targetId, newReply) {
+              for (let comment of comments) {
+                // Check if this is the target comment
+                if (comment.id == targetId) {
+                  const updatedReplies = [...(comment.replies || []), newReply];
+                  return { comment, updatedReplies };
+                }
+                
+                // Check nested replies recursively
+                if (comment.replies && comment.replies.length > 0) {
+                  const result = addReplyToNestedReplies(comment.replies, targetId, newReply);
+                  if (result) {
+                    return { comment, updatedReplies: comment.replies };
+                  }
+                }
+              }
+              return null;
+            }
             
-            // Update the comment with new reply
+            // Function to handle nested replies
+            function addReplyToNestedReplies(replies, targetId, newReply) {
+              for (let i = 0; i < replies.length; i++) {
+                if (replies[i].id === targetId) {
+                  if (!replies[i].replies) replies[i].replies = [];
+                  replies[i].replies.push(newReply);
+                  return true;
+                }
+                
+                // Check deeper nesting
+                if (replies[i].replies && replies[i].replies.length > 0) {
+                  if (addReplyToNestedReplies(replies[i].replies, targetId, newReply)) {
+                    return true;
+                  }
+                }
+              }
+              return false;
+            }
+            
+            const result = addReplyToTarget(allComments, parentCommentId, newReply);
+            
+            if (!result) {
+              console.log('4. ERROR - Parent comment/reply not found in database');
+              return res.status(404).json({ error: 'Parent comment or reply not found' });
+            }
+            
+            // Update the top-level comment with the modified replies structure
             const { data, error: updateError } = await supabase
               .from('comments')
-              .update({ replies: updatedReplies })
-              .eq('id', parentCommentId)
+              .update({ replies: result.updatedReplies })
+              .eq('id', result.comment.id)
               .select()
               .single();
             
@@ -233,13 +275,14 @@ export default async function handler(req, res) {
               throw updateError;
             }
             
-            console.log('✅ Reply added to database permanently');
+            console.log('✅ Nested reply added to database permanently');
             
             return res.status(201).json({
               success: true,
               reply: newReply,
               action: 'reply',
-              storage: 'supabase-permanent'
+              storage: 'supabase-permanent',
+              parentType: result.comment.id == parentCommentId ? 'comment' : 'nested-reply'
             });
             
           } else {

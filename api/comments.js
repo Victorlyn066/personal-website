@@ -20,9 +20,67 @@ if (supabaseUrl && supabaseKey) {
 // Fallback global storage if Supabase not available
 global.commentsStore = global.commentsStore || {};
 
+// Migration mapping from old file-based IDs to new custom slugs
+const slugMigrationMap = {
+  'first-post': 'communicating-privacy-australian-law',
+  'second-post': 'generative-ai-ip-challenges', 
+  'third-post': 'regulating-deepfakes',
+  'markdown-style-guide': 'cybersecurity-regulation-ai-systems',
+  'using-mdx': 'algorithmic-bias-discrimination'
+};
+
+// Global flag to ensure migration only runs once per deployment
+global.commentsMigrationCompleted = global.commentsMigrationCompleted || false;
+
+async function migrateOldSlugs() {
+  if (!supabase || global.commentsMigrationCompleted) {
+    return;
+  }
+  
+  try {
+    console.log('🔄 Checking for comments that need slug migration...');
+    
+    for (const [oldSlug, newSlug] of Object.entries(slugMigrationMap)) {
+      const { data: oldComments, error } = await supabase
+        .from('comments')
+        .select('id')
+        .eq('post_slug', oldSlug);
+        
+      if (error) {
+        console.error(`❌ Error checking for ${oldSlug}:`, error);
+        continue;
+      }
+      
+      if (oldComments && oldComments.length > 0) {
+        console.log(`🔄 Migrating ${oldComments.length} comments from "${oldSlug}" to "${newSlug}"`);
+        
+        const { error: updateError } = await supabase
+          .from('comments')
+          .update({ post_slug: newSlug })
+          .eq('post_slug', oldSlug);
+          
+        if (updateError) {
+          console.error(`❌ Failed to migrate ${oldSlug}:`, updateError);
+        } else {
+          console.log(`✅ Successfully migrated comments for ${oldSlug}`);
+        }
+      }
+    }
+    
+    global.commentsMigrationCompleted = true;
+    console.log('✅ Comment migration check completed');
+    
+  } catch (error) {
+    console.error('❌ Migration error:', error);
+  }
+}
+
 async function loadCommentsStore() {
   try {
     if (supabase) {
+      // Run migration check first
+      await migrateOldSlugs();
+      
       console.log('📁 Loading comments from Supabase database...');
       
       const { data, error } = await supabase

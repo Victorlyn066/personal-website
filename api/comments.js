@@ -9,12 +9,19 @@ const COMMENTS_KEY = 'blog_comments_store';
 async function loadCommentsStore() {
   try {
     console.log('📁 Loading comments from Vercel KV...');
+    console.log('🔍 Available env vars:', {
+      REDIS_URL: !!process.env.REDIS_URL,
+      KV_REST_API_URL: !!process.env.KV_REST_API_URL,
+      KV_REST_API_TOKEN: !!process.env.KV_REST_API_TOKEN
+    });
+    
     const store = await kv.get(COMMENTS_KEY) || {};
     console.log('📊 Available posts:', Object.keys(store));
     console.log('📈 Total stored comments:', Object.values(store).reduce((sum, comments) => sum + (comments?.length || 0), 0));
     return store;
   } catch (error) {
     console.error('❌ Error loading from KV, using fallback:', error);
+    console.error('Error details:', error.message);
     // Fallback to global storage if KV fails
     global.commentsStore = global.commentsStore || {};
     return global.commentsStore;
@@ -75,7 +82,12 @@ export default async function handler(req, res) {
           availablePosts: Object.keys(commentsStore),
           totalPosts: Object.keys(commentsStore).length,
           storageType: 'vercel-kv-with-fallback',
-          kvAvailable: !!process.env.KV_REST_API_URL
+          kvAvailable: !!(process.env.KV_REST_API_URL || process.env.REDIS_URL),
+          envVars: {
+            REDIS_URL: !!process.env.REDIS_URL,
+            KV_REST_API_URL: !!process.env.KV_REST_API_URL,
+            KV_REST_API_TOKEN: !!process.env.KV_REST_API_TOKEN
+          }
         }
       });
     } catch (error) {

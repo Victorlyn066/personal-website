@@ -1,6 +1,6 @@
 ---
 title: 'Cybersecurity Regulation for AI Systems: Mitigating Liability and Compliance Risks'
-description: 'Strap in for a rollercoaster ride through Australia's evolving AI security rulebook, where cryptographic capes and legal guardrails team up to fend off data breaches and liability pitfalls!'
+description: 'Strap in for a rollercoaster ride through Australia''s evolving AI security rulebook, where cryptographic capes and legal guardrails team up to fend off data breaches and liability pitfalls!'
 pubDate: 'July 23 2025'
 heroImage: '../../assets/blog-placeholder-1.jpg'
 slug: 'cybersecurity-regulation-ai-systems'

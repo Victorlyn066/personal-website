@@ -18,6 +18,21 @@ const { postSlug } = Astro.props;
   <div id="login-section" class="login-section">
     <h4>Sign in to leave a comment</h4>
     
+    <!-- Debug buttons (temporary) -->
+    <div style="background: #f0f0f0; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border: 2px solid #e0e0e0;">
+      <h4 style="margin: 0 0 1rem 0; color: #333;">🔧 Debug Tools (Temporary)</h4>
+      <button id="test-api-btn" style="background: #4285f4; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-right: 8px;">
+        Test API
+      </button>
+      <button id="debug-storage-btn" style="background: #ff9800; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-right: 8px;">
+        Check Storage
+      </button>
+      <button id="add-test-comment-btn" style="background: #4caf50; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">
+        Add Test Comment
+      </button>
+      <div id="debug-results" style="margin-top: 1rem; padding: 1rem; background: white; border-radius: 4px; font-family: monospace; font-size: 12px; max-height: 200px; overflow-y: auto;"></div>
+    </div>
+
     <!-- Google Sign In Button -->
     <div id="google-signin-container" class="google-signin-centered">
       <div id="g_id_onload"
@@ -1259,6 +1274,57 @@ const { postSlug } = Astro.props;
     setTimeout(() => {
       initializeGoogleOAuth();
     }, 1500);
+
+    // Debug button handlers
+    const testApiBtn = document.getElementById('test-api-btn');
+    const debugStorageBtn = document.getElementById('debug-storage-btn');
+    const addTestCommentBtn = document.getElementById('add-test-comment-btn');
+    const debugResults = document.getElementById('debug-results');
+
+    if (testApiBtn) {
+      testApiBtn.addEventListener('click', async () => {
+        debugResults!.innerHTML = 'Testing API...';
+        try {
+          const response = await fetch(`/api/comments?postSlug=${encodeURIComponent(postSlug)}`);
+          const data = await response.json();
+          debugResults!.innerHTML = `<strong>API Test Result:</strong><br/><pre>${JSON.stringify(data, null, 2)}</pre>`;
+        } catch (error) {
+          debugResults!.innerHTML = `<strong>API Test Error:</strong><br/><pre>${error}</pre>`;
+        }
+      });
+    }
+
+    if (debugStorageBtn) {
+      debugStorageBtn.addEventListener('click', async () => {
+        debugResults!.innerHTML = 'Checking storage...';
+        try {
+          const response = await fetch('/api/debug-comments');
+          const data = await response.json();
+          debugResults!.innerHTML = `<strong>Storage Debug:</strong><br/><pre>${JSON.stringify(data, null, 2)}</pre>`;
+        } catch (error) {
+          debugResults!.innerHTML = `<strong>Storage Debug Error:</strong><br/><pre>${error}</pre>`;
+        }
+      });
+    }
+
+    if (addTestCommentBtn) {
+      addTestCommentBtn.addEventListener('click', async () => {
+        debugResults!.innerHTML = 'Adding test comment...';
+        try {
+          const response = await fetch('/api/debug-comments', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ postSlug: postSlug })
+          });
+          const data = await response.json();
+          debugResults!.innerHTML = `<strong>Test Comment Added:</strong><br/><pre>${JSON.stringify(data, null, 2)}</pre>`;
+          // Reload comments to see the test comment
+          setTimeout(() => loadComments(), 1000);
+        } catch (error) {
+          debugResults!.innerHTML = `<strong>Add Test Comment Error:</strong><br/><pre>${error}</pre>`;
+        }
+      });
+    }
 
     // Handle storage info button
     const storageInfoBtn = document.getElementById('storage-info-btn');

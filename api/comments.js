@@ -1,8 +1,40 @@
 // Vercel Function for comments API
 // This works with static Astro builds
 
-// Simple in-memory storage (resets on deployment)
-let commentsStore = {};
+import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { join } from 'path';
+
+// File-based storage that persists across function invocations
+const STORAGE_FILE = '/tmp/comments.json';
+
+function loadCommentsStore() {
+  try {
+    if (existsSync(STORAGE_FILE)) {
+      console.log('📁 Loading existing comments from storage file');
+      const data = readFileSync(STORAGE_FILE, 'utf8');
+      const store = JSON.parse(data);
+      console.log('📊 Loaded store with posts:', Object.keys(store));
+      return store;
+    } else {
+      console.log('📁 No storage file exists, starting with empty store');
+    }
+  } catch (error) {
+    console.error('❌ Error loading comments store:', error);
+  }
+  return {};
+}
+
+function saveCommentsStore(store) {
+  try {
+    writeFileSync(STORAGE_FILE, JSON.stringify(store, null, 2));
+    console.log('💾 Comments store saved successfully');
+    console.log('📊 Saved store with posts:', Object.keys(store));
+    const totalComments = Object.values(store).reduce((sum, comments) => sum + comments.length, 0);
+    console.log('📈 Total comments across all posts:', totalComments);
+  } catch (error) {
+    console.error('❌ Error saving comments store:', error);
+  }
+}
 
 export default function handler(req, res) {
   // Enable CORS
@@ -24,8 +56,10 @@ export default function handler(req, res) {
       return res.status(400).json({ error: 'postSlug is required' });
     }
 
+    const commentsStore = loadCommentsStore();
     const comments = commentsStore[postSlug] || [];
-    console.log('Found comments:', comments.length);
+    console.log('Loaded comments from storage:', comments.length);
+    console.log('Storage file exists:', existsSync(STORAGE_FILE));
 
     return res.status(200).json({ comments });
   }
@@ -42,6 +76,9 @@ export default function handler(req, res) {
         return res.status(400).json({ error: 'postSlug is required' });
       }
 
+      // Load current storage
+      const commentsStore = loadCommentsStore();
+      
       // Initialize storage for this post if needed
       if (!commentsStore[postSlug]) {
         commentsStore[postSlug] = [];
@@ -78,6 +115,9 @@ export default function handler(req, res) {
 
         if (replyAdded) {
           console.log('4. Reply added successfully:', newReply);
+          console.log('5. Saving updated comments to storage...');
+          saveCommentsStore(commentsStore);
+          
           return res.status(201).json({
             success: true,
             reply: newReply,
@@ -106,6 +146,8 @@ export default function handler(req, res) {
 
         console.log('4. Comment added successfully:', newComment);
         console.log('5. Total comments now:', commentsStore[postSlug].length);
+        console.log('6. Saving updated comments to storage...');
+        saveCommentsStore(commentsStore);
 
         return res.status(201).json({
           success: true,

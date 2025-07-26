@@ -1,5 +1,6 @@
-// Debug endpoint to check comment storage
+// Debug endpoint to check comment storage - REBUILT
 // Using Vercel KV for persistent storage
+// Force deploy: 2025-01-25
 
 import { kv } from '@vercel/kv';
 

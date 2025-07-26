@@ -1,6 +1,7 @@
 // Vercel Function for comments API  
 // Using Supabase for permanent database storage
 // Comments persist forever across all cold starts and deployments
+// Force deploy: 2025-01-25
 
 import { createClient } from '@supabase/supabase-js';
 

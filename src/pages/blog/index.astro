@@ -18,6 +18,131 @@ const posts = (await getCollection('blog')).sort(
 	<head>
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
 		<style>
+			/* Search bar styles */
+			.search-container {
+				display: flex;
+				justify-content: center;
+				margin-bottom: 2rem;
+				animation: slideInLeft 0.6s ease-out;
+			}
+			
+			.search-box {
+				position: relative;
+				width: 100%;
+				max-width: 500px;
+			}
+			
+			.search-input {
+				width: 100%;
+				padding: 1rem 1rem 1rem 3rem;
+				font-size: 1.1rem;
+				border: 2px solid #e0e0e0;
+				border-radius: 50px;
+				background: white;
+				color: #333;
+				outline: none;
+				transition: all 0.3s ease;
+				box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+			}
+			
+			.search-input:focus {
+				border-color: #2a72e5;
+				box-shadow: 0 6px 30px rgba(42, 114, 229, 0.2);
+				transform: translateY(-2px);
+			}
+			
+			.search-input::placeholder {
+				color: #999;
+			}
+			
+			.search-icon {
+				position: absolute;
+				left: 1rem;
+				top: 50%;
+				transform: translateY(-50%);
+				color: #666;
+				font-size: 1.2rem;
+				pointer-events: none;
+			}
+			
+			.clear-search {
+				position: absolute;
+				right: 1rem;
+				top: 50%;
+				transform: translateY(-50%);
+				background: none;
+				border: none;
+				color: #999;
+				font-size: 1.2rem;
+				cursor: pointer;
+				padding: 0.25rem;
+				border-radius: 50%;
+				transition: all 0.3s ease;
+				opacity: 0;
+				pointer-events: none;
+			}
+			
+			.clear-search.visible {
+				opacity: 1;
+				pointer-events: auto;
+			}
+			
+			.clear-search:hover {
+				color: #666;
+				background: #f0f0f0;
+			}
+			
+			/* Dark mode search styles */
+			html.dark .search-input {
+				background: #1a1a1a;
+				color: #fff;
+				border-color: #333;
+			}
+			
+			html.dark .search-input:focus {
+				border-color: #2a72e5;
+				box-shadow: 0 6px 30px rgba(42, 114, 229, 0.3);
+			}
+			
+			html.dark .search-input::placeholder {
+				color: #666;
+			}
+			
+			html.dark .search-icon {
+				color: #999;
+			}
+			
+			html.dark .clear-search:hover {
+				color: #ccc;
+				background: #333;
+			}
+			
+			/* No results message */
+			.no-results {
+				text-align: center;
+				padding: 3rem;
+				color: #666;
+				font-size: 1.1rem;
+				display: none;
+			}
+			
+			html.dark .no-results {
+				color: #999;
+			}
+			
+			/* Search result highlight */
+			.search-highlight {
+				background: linear-gradient(120deg, #fff59d 0%, #ffeb3b 100%);
+				padding: 0.1rem 0.2rem;
+				border-radius: 3px;
+				font-weight: 600;
+			}
+			
+			html.dark .search-highlight {
+				background: linear-gradient(120deg, #555 0%, #666 100%);
+				color: #fff;
+			}
+
 			/* Page animations */
 			@keyframes fadeInUp {
 				from {
@@ -302,10 +427,25 @@ const posts = (await getCollection('blog')).sort(
 		<Header />
 		<main>
 			<section>
-				<ul>
+				<!-- Search functionality -->
+				<div class="search-container">
+					<div class="search-box">
+						<span class="search-icon">🔍</span>
+						<input 
+							type="text" 
+							class="search-input" 
+							placeholder="Search blog posts..." 
+							id="searchInput"
+						/>
+						<button class="clear-search" id="clearSearch">✕</button>
+					</div>
+				</div>
+				
+				<!-- Posts list -->
+				<ul id="postsList">
 					{
 						posts.map((post) => (
-							<li>
+							<li data-title={post.data.title.toLowerCase()} data-description={post.data.description?.toLowerCase() || ''}>
 								<a href={`/blog/${post.id}/`}>
 									{post.data.heroImage && (
 										<Image width={720} height={360} src={post.data.heroImage} alt="" />
@@ -322,8 +462,93 @@ const posts = (await getCollection('blog')).sort(
 						))
 					}
 				</ul>
+				
+				<!-- No results message -->
+				<div class="no-results" id="noResults">
+					<p>No blog posts found matching your search.</p>
+					<p>Try different keywords or browse all posts below.</p>
+				</div>
 			</section>
 		</main>
 		<Footer />
+		
+		<script>
+			// Search functionality
+			const searchInput = document.getElementById('searchInput') as HTMLInputElement | null;
+			const clearButton = document.getElementById('clearSearch') as HTMLButtonElement | null;
+			const postsList = document.getElementById('postsList') as HTMLUListElement | null;
+			const noResults = document.getElementById('noResults') as HTMLDivElement | null;
+			
+			if (!searchInput || !clearButton || !postsList || !noResults) {
+				console.error('Search elements not found');
+			} else {
+				const posts = Array.from(postsList.querySelectorAll('li'));
+				
+				function highlightText(text: string, searchTerm: string): string {
+					if (!searchTerm) return text;
+					const regex = new RegExp(`(${searchTerm})`, 'gi');
+					return text.replace(regex, '<span class="search-highlight">$1</span>');
+				}
+				
+				function filterPosts() {
+					const searchTerm = searchInput!.value.toLowerCase().trim();
+					let visibleCount = 0;
+					
+					// Show/hide clear button
+					clearButton!.classList.toggle('visible', searchTerm.length > 0);
+					
+					posts.forEach(post => {
+						const title = post.dataset.title || '';
+						const description = post.dataset.description || '';
+						const titleElement = post.querySelector('.title');
+						
+						if (!titleElement) return;
+						
+						const originalTitle = titleElement.textContent || '';
+						
+						if (title.includes(searchTerm) || description.includes(searchTerm)) {
+							post.style.display = 'block';
+							visibleCount++;
+							
+							// Highlight matching text in title
+							if (searchTerm) {
+								titleElement.innerHTML = highlightText(originalTitle, searchTerm);
+							} else {
+								titleElement.textContent = originalTitle;
+							}
+						} else {
+							post.style.display = 'none';
+						}
+					});
+					
+					// Show/hide no results message
+					noResults!.style.display = visibleCount === 0 && searchTerm ? 'block' : 'none';
+					postsList!.style.display = visibleCount === 0 && searchTerm ? 'none' : 'flex';
+				}
+				
+				function clearSearch() {
+					searchInput!.value = '';
+					filterPosts();
+					searchInput!.focus();
+				}
+				
+				// Event listeners
+				searchInput.addEventListener('input', filterPosts);
+				searchInput.addEventListener('keydown', (e) => {
+					if (e.key === 'Escape') {
+						clearSearch();
+					}
+				});
+				clearButton.addEventListener('click', clearSearch);
+				
+				// Focus search input with keyboard shortcut (Ctrl/Cmd + K)
+				document.addEventListener('keydown', (e) => {
+					if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+						e.preventDefault();
+						searchInput!.focus();
+					}
+				});
+			}
+		</script>
 	</body>
 </html>

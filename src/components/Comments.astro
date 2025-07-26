@@ -1787,23 +1787,23 @@ const { postSlug } = Astro.props;
         replies: []
       };
       
-      const result = await saveComment(comment);
-      if (result) {
-        textarea.value = '';
-        await loadComments();
-        hideCommentForm();
+      try {
+        const result = await saveComment(comment);
+        if (result) {
+          console.log('✅ Comment saved successfully, refreshing comments...');
+          textarea.value = '';
+          await loadComments();
+          hideCommentForm();
+        }
+      } catch (error) {
+        console.error('❌ Comment save failed:', error);
+        alert('Failed to save comment to shared backend. Please check your connection and try again.');
       }
     }
     
     async function saveComment(comment: any) {
-      // Save to localStorage immediately for instant UI update (like the working version)
-      const commentsKey = `comments_${postSlug}`;
-      let localComments = JSON.parse(localStorage.getItem(commentsKey) || '[]');
-      localComments.unshift(comment);
-      localStorage.setItem(commentsKey, JSON.stringify(localComments));
-      console.log('✅ Comment saved to localStorage for instant display');
+      console.log('💾 Saving comment to shared backend...');
       
-      // Also save to backend API for shared storage (non-blocking)
       try {
         const response = await fetch('/api/comments', {
           method: 'POST',
@@ -1817,54 +1817,72 @@ const { postSlug } = Astro.props;
         });
         
         if (response.ok) {
-          console.log('✅ Comment also saved to backend API');
-          return await response.json();
+          console.log('✅ Comment saved to shared backend successfully');
+          const result = await response.json();
+          return result;
         } else {
-          console.warn('⚠️ Backend API save failed, but comment is in localStorage');
+          throw new Error(`API save failed: ${response.status} ${response.statusText}`);
         }
       } catch (error) {
-        console.warn('⚠️ Backend API unavailable, using localStorage only:', error);
-        // Don't show alert - just log the issue
+        console.error('❌ Failed to save comment to shared backend:', error);
+        
+        // Only save to localStorage as emergency fallback when API completely fails
+        console.warn('⚠️ Using localStorage as emergency fallback - comment will NOT be shared with other users');
+        const commentsKey = `comments_${postSlug}`;
+        let localComments = JSON.parse(localStorage.getItem(commentsKey) || '[]');
+        localComments.unshift(comment);
+        localStorage.setItem(commentsKey, JSON.stringify(localComments));
+        
+        throw error; // Re-throw to let caller know it failed
       }
     }
     
     async function loadComments(retryCount = 0) {
       if (!commentsList) return;
       
-      console.log(`Loading comments (attempt ${retryCount + 1})...`);
+      console.log(`Loading comments from API (attempt ${retryCount + 1})...`);
       
-      // First, try to load from API for shared comments
       try {
         const response = await fetch(`/api/comments?postSlug=${encodeURIComponent(postSlug)}`);
         
         if (response.ok) {
           const data = await response.json();
           const comments = data.comments || [];
-          console.log(`✅ Loaded ${comments.length} comments from API`);
+          console.log(`✅ Successfully loaded ${comments.length} shared comments from API`);
           renderComments(comments);
           return;
         } else {
-          throw new Error(`API failed: ${response.status} ${response.statusText}`);
+          throw new Error(`API response: ${response.status} ${response.statusText}`);
         }
       } catch (error) {
-        console.warn(`⚠️ API load failed, falling back to localStorage:`, error);
+        console.error(`❌ Error loading comments (attempt ${retryCount + 1}):`, error);
         
-        // Fallback to localStorage (like the working version)
-        const commentsKey = `comments_${postSlug}`;
-        const localComments = JSON.parse(localStorage.getItem(commentsKey) || '[]');
-        console.log(`📱 Loaded ${localComments.length} comments from localStorage`);
-        renderComments(localComments);
-        
-        // Only retry API if this is the first attempt and we have no local comments
-        if (retryCount === 0 && localComments.length === 0) {
-          console.log('Retrying API load in 2 seconds...');
-          setTimeout(() => loadComments(1), 2000);
+        // Retry up to 3 times for API (shared comments are essential)
+        if (retryCount < 2) {
+          const retryDelay = Math.pow(2, retryCount) * 1000; // 1s, 2s, 4s
+          console.log(`Retrying API in ${retryDelay}ms...`);
+          setTimeout(() => {
+            loadComments(retryCount + 1);
+          }, retryDelay);
+        } else {
+          console.error('❌ All API retry attempts failed - this means shared comments are not working');
+          if (commentsList) {
+            commentsList.innerHTML = `
+              <div class="no-comments" style="text-align: center; padding: 2rem; border: 1px solid #f44336; border-radius: 8px; background: #ffebee;">
+                <p style="color: #d32f2f; margin: 0 0 1rem 0;">⚠️ Unable to load shared comments</p>
+                <p style="color: #666; font-size: 14px; margin: 0 0 1rem 0;">The comment system requires a working backend connection</p>
+                <button onclick="loadComments(0)" style="background: #4285f4; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">
+                  Retry Connection
+                </button>
+              </div>
+            `;
+          }
         }
-        return;
       }
     }
     
     function renderComments(comments: any[]) {
+      if (!commentsList) return;
       
       if (comments.length === 0) {
         commentsList.innerHTML = '<div class="no-comments">💬 No comments yet. Be the first to share your thoughts!</div>';
@@ -2368,45 +2386,13 @@ const { postSlug } = Astro.props;
       if (!replyText) return;
       
       const reply = {
-        id: 'reply_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
         author: currentUser.name,
         content: replyText,
-        date: new Date().toISOString(),
-        timestamp: Date.now(),
-        userPicture: currentUser.picture,
-        replies: []
+        userPicture: currentUser.picture
       };
       
-      // Save to localStorage immediately (like the working version)
-      const commentsKey = `comments_${postSlug}`;
-      let comments = JSON.parse(localStorage.getItem(commentsKey) || '[]');
-      
-      function addReplyToComment(comments: any[], parentId: string, newReply: any): boolean {
-        for (let comment of comments) {
-          if (comment.id === parentId) {
-            if (!comment.replies) comment.replies = [];
-            comment.replies.push(newReply);
-            return true;
-          }
-          if (comment.replies && addReplyToComment(comment.replies, parentId, newReply)) {
-            return true;
-          }
-        }
-        return false;
-      }
-      
-      addReplyToComment(comments, parentId, reply);
-      localStorage.setItem(commentsKey, JSON.stringify(comments));
-      console.log('✅ Reply saved to localStorage for instant display');
-      
-      // Clear the form and update UI immediately
-      textarea.value = '';
-      loadComments();
-      (window as any).hideReplyForm(parentId);
-      
-      // Also try to save to backend API (non-blocking)
       try {
-        console.log('Submitting reply to API...');
+        console.log('💾 Submitting reply to shared backend...');
         const response = await fetch('/api/comments', {
           method: 'POST',
           headers: {
@@ -2422,13 +2408,18 @@ const { postSlug } = Astro.props;
 
         if (response.ok) {
           const result = await response.json();
-          console.log('✅ Reply also saved to backend API:', result);
+          console.log('✅ Reply saved to shared backend successfully:', result);
+          
+          // Clear the form and refresh comments to show all shared comments
+          textarea.value = '';
+          loadComments();
+          (window as any).hideReplyForm(parentId);
         } else {
-          console.warn('⚠️ Backend API save failed, but reply is in localStorage');
+          throw new Error(`Reply API failed: ${response.status} ${response.statusText}`);
         }
       } catch (error) {
-        console.warn('⚠️ Backend API unavailable, using localStorage only:', error);
-        // Don't show alert - just log the issue
+        console.error('❌ Failed to save reply to shared backend:', error);
+        alert('Failed to save reply to shared backend. Please check your connection and try again.');
       }
     };
   });

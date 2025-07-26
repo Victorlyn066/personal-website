@@ -1252,8 +1252,8 @@ const { postSlug } = Astro.props;
     // Check if user is already logged in
     checkLoginStatus();
     
-    // Load comments for this post
-    loadComments();
+    // Load comments for this post with retry if DOM elements aren't ready
+    loadCommentsWithDOMCheck();
     
     // Initialize Google OAuth after a delay to ensure API is loaded
     setTimeout(() => {
@@ -1842,30 +1842,98 @@ const { postSlug } = Astro.props;
       }
     }
     
+    async function loadCommentsWithDOMCheck(domRetryCount = 0) {
+      // Ensure DOM elements are ready before loading comments
+      if (!commentsList) {
+        if (domRetryCount < 10) { // Retry up to 10 times (5 seconds total)
+          console.log(`⏳ Waiting for commentsList DOM element... (attempt ${domRetryCount + 1}/10)`);
+          setTimeout(() => {
+            loadCommentsWithDOMCheck(domRetryCount + 1);
+          }, 500);
+          return;
+        } else {
+          console.error('❌ commentsList DOM element not found after 10 attempts');
+          return;
+        }
+      }
+      
+      // DOM is ready, now load comments
+      loadComments();
+    }
+
     async function loadComments(retryCount = 0) {
-      if (!commentsList) return;
+      if (!commentsList) {
+        console.error('❌ commentsList not available');
+        return;
+      }
       
       console.log(`Loading comments from API (attempt ${retryCount + 1})...`);
       
+      // Show loading indicator on first attempt
+      if (retryCount === 0 && commentsList) {
+        commentsList.innerHTML = `
+          <div class="loading-comments" style="text-align: center; padding: 2rem; color: #666;">
+            <div style="display: inline-block; animation: spin 1s linear infinite; margin-right: 8px;">⏳</div>
+            Loading shared comments...
+          </div>
+          <style>
+            @keyframes spin {
+              from { transform: rotate(0deg); }
+              to { transform: rotate(360deg); }
+            }
+          </style>
+        `;
+      }
+      
       try {
-        const response = await fetch(`/api/comments?postSlug=${encodeURIComponent(postSlug)}`);
+        console.log(`🌐 Fetching: /api/comments?postSlug=${encodeURIComponent(postSlug)}`);
+        console.log(`📱 User agent: ${navigator.userAgent.substring(0, 50)}...`);
+        console.log(`🔗 Network connection: ${navigator.onLine ? 'Online' : 'Offline'}`);
+        
+        const response = await fetch(`/api/comments?postSlug=${encodeURIComponent(postSlug)}`, {
+          method: 'GET',
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Accept': 'application/json'
+          }
+        });
+        
+        console.log(`📡 Response status: ${response.status} ${response.statusText}`);
+        console.log(`📦 Response headers:`, Object.fromEntries(response.headers.entries()));
         
         if (response.ok) {
           const data = await response.json();
           const comments = data.comments || [];
           console.log(`✅ Successfully loaded ${comments.length} shared comments from API`);
+          console.log(`📝 Comments data:`, comments);
           renderComments(comments);
           return;
         } else {
-          throw new Error(`API response: ${response.status} ${response.statusText}`);
+          const errorText = await response.text();
+          console.error(`❌ API Error Response Body:`, errorText);
+          throw new Error(`API response: ${response.status} ${response.statusText} - ${errorText}`);
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error(`❌ Error loading comments (attempt ${retryCount + 1}):`, error);
+        console.error(`❌ Error type: ${error?.constructor?.name || 'Unknown'}`);
+        console.error(`❌ Error message: ${error?.message || 'Unknown error'}`);
+        
+        // Check if this is a cold start or network timeout issue
+        const errorMessage = error?.message || '';
+        const isColdStart = errorMessage.includes('timeout') || errorMessage.includes('ECONNRESET') || errorMessage.includes('502');
+        const isNetworkError = !navigator.onLine || error?.name === 'TypeError';
+        
+        console.log(`🔍 Error analysis - Cold start: ${isColdStart}, Network: ${isNetworkError}`);
         
         // Retry up to 5 times for API (shared comments are essential)
         if (retryCount < 4) {
-          const retryDelay = Math.min(Math.pow(2, retryCount) * 1000, 5000); // 1s, 2s, 4s, 5s, 5s (max 5s)
-          console.log(`Retrying API in ${retryDelay}ms... (attempt ${retryCount + 2}/5)`);
+          // Use longer delays for cold starts
+          let retryDelay = Math.min(Math.pow(2, retryCount) * 1000, 5000); // 1s, 2s, 4s, 5s, 5s
+          if (isColdStart && retryCount < 2) {
+            retryDelay = 8000; // 8 seconds for cold start
+          }
+          
+          console.log(`🔄 Retrying API in ${retryDelay}ms... (attempt ${retryCount + 2}/5) - ${isColdStart ? 'Cold start detected' : 'Standard retry'}`);
           setTimeout(() => {
             loadComments(retryCount + 1);
           }, retryDelay);

@@ -1326,6 +1326,8 @@ const { postSlug } = Astro.props;
     function handleCredentialResponse(response: any) {
       console.log('=== GOOGLE SIGN-IN CALLBACK ===');
       console.log('Response received:', response);
+      console.log('User agent:', navigator.userAgent);
+      console.log('Is mobile:', /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
       
       try {
         // Decode the JWT token to get user info
@@ -2068,13 +2070,22 @@ const { postSlug } = Astro.props;
         return;
       }
       
+      // Detect mobile device
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      console.log('📱 Is mobile device:', isMobile);
+      
       try {
-        // Initialize Google OAuth  
+        // Initialize Google OAuth with mobile-friendly settings
         (window as any).google.accounts.id.initialize({
           client_id: '175048817524-o1dvmrsjvskvtth2vdno9dn28h3fkpjr.apps.googleusercontent.com',
           callback: handleCredentialResponse,
           auto_select: false,
-          cancel_on_tap_outside: false
+          cancel_on_tap_outside: false,
+          // Mobile-specific configurations
+          ux_mode: 'popup', // Use popup mode consistently
+          state_cookie_domain: window.location.hostname,
+          hosted_domain: undefined, // Allow any domain
+          use_fedcm_for_prompt: false // Disable FedCM which can cause mobile issues
         });
         
         // Clear and recreate the sign-in button container
@@ -2082,15 +2093,19 @@ const { postSlug } = Astro.props;
         if (signInContainer) {
           signInContainer.innerHTML = '';  // Clear existing content
           
-          (window as any).google.accounts.id.renderButton(signInContainer, {
+          // Configure button based on device type
+          const buttonConfig = {
             type: 'standard',
-            shape: 'rectangular',
+            shape: 'rectangular', 
             theme: 'outline',
             text: 'signin_with',
-            size: 'large',
+            size: isMobile ? 'medium' : 'large', // Smaller button on mobile
+            width: isMobile ? '280' : '320', // Responsive width
             logo_alignment: 'left'
-          });
-          console.log('✅ Google sign-in button rendered');
+          };
+          
+          (window as any).google.accounts.id.renderButton(signInContainer, buttonConfig);
+          console.log('✅ Google sign-in button rendered with config:', buttonConfig);
         }
         
         // Show the Google container
@@ -2103,6 +2118,27 @@ const { postSlug } = Astro.props;
         console.log('✅ Google OAuth initialized successfully');
       } catch (error) {
         console.error('❌ Error initializing Google OAuth:', error);
+        
+        // On mobile, if OAuth fails, provide a manual login option
+        if (isMobile) {
+          const signInContainer = document.querySelector('.g_id_signin');
+          if (signInContainer) {
+            signInContainer.innerHTML = `
+              <div style="text-align: center; padding: 1rem; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;">
+                <p style="margin: 0 0 1rem 0; color: #666; font-size: 14px;">
+                  Having trouble signing in?
+                </p>
+                <p style="margin: 0 0 1rem 0; color: #888; font-size: 12px;">
+                  Try refreshing the page or switching to desktop
+                </p>
+                <button onclick="window.location.reload()" 
+                        style="background: #4285f4; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                  Refresh Page
+                </button>
+              </div>
+            `;
+          }
+        }
       }
       
       console.log('=== GOOGLE OAUTH INITIALIZATION COMPLETE ===');

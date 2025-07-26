@@ -1242,6 +1242,13 @@ const { postSlug } = Astro.props;
     
     // Simple, clean initialization - no special logout handling needed
     
+    // Clear any existing localStorage comments to ensure consistency with shared backend
+    const commentsKey = `comments_${postSlug}`;
+    if (localStorage.getItem(commentsKey)) {
+      console.log('🧹 Clearing old localStorage comments to ensure consistency with shared backend');
+      localStorage.removeItem(commentsKey);
+    }
+    
     // Check if user is already logged in
     checkLoginStatus();
     
@@ -1725,6 +1732,12 @@ const { postSlug } = Astro.props;
       }
       if (addCommentBtn) addCommentBtn.style.display = 'none';
       
+      // Hide comment form if it's showing
+      if (commentFormSection) {
+        commentFormSection.style.display = 'none';
+        console.log('✅ Comment form hidden');
+      }
+      
       // Show Google sign-in container
       const googleContainer = document.getElementById('google-signin-container');
       if (googleContainer) {
@@ -1825,15 +1838,7 @@ const { postSlug } = Astro.props;
         }
       } catch (error) {
         console.error('❌ Failed to save comment to shared backend:', error);
-        
-        // Only save to localStorage as emergency fallback when API completely fails
-        console.warn('⚠️ Using localStorage as emergency fallback - comment will NOT be shared with other users');
-        const commentsKey = `comments_${postSlug}`;
-        let localComments = JSON.parse(localStorage.getItem(commentsKey) || '[]');
-        localComments.unshift(comment);
-        localStorage.setItem(commentsKey, JSON.stringify(localComments));
-        
-        throw error; // Re-throw to let caller know it failed
+        throw error; // Re-throw to let caller know it failed - no localStorage fallback for consistency
       }
     }
     
@@ -1857,10 +1862,10 @@ const { postSlug } = Astro.props;
       } catch (error) {
         console.error(`❌ Error loading comments (attempt ${retryCount + 1}):`, error);
         
-        // Retry up to 3 times for API (shared comments are essential)
-        if (retryCount < 2) {
-          const retryDelay = Math.pow(2, retryCount) * 1000; // 1s, 2s, 4s
-          console.log(`Retrying API in ${retryDelay}ms...`);
+        // Retry up to 5 times for API (shared comments are essential)
+        if (retryCount < 4) {
+          const retryDelay = Math.min(Math.pow(2, retryCount) * 1000, 5000); // 1s, 2s, 4s, 5s, 5s (max 5s)
+          console.log(`Retrying API in ${retryDelay}ms... (attempt ${retryCount + 2}/5)`);
           setTimeout(() => {
             loadComments(retryCount + 1);
           }, retryDelay);

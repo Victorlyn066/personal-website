@@ -329,12 +329,14 @@ import { SITE_TITLE } from '../consts';
        /* Purpose navigation buttons */
        .purpose-nav {
          display: grid;
-         grid-template-columns: repeat(4, 1fr);
+         grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
          gap: 0.8em;
          margin-bottom: 2em;
          padding: 1em;
          background: #f8f9fa;
          border-radius: 8px;
+         justify-items: center;
+         align-items: center;
        }
 
        /* Mobile: keep 2x2 grid for better usability */
@@ -367,6 +369,8 @@ import { SITE_TITLE } from '../consts';
          text-align: center;
          white-space: nowrap;
          min-height: 44px;
+         width: 100%;
+         max-width: 200px;
          display: flex;
          align-items: center;
          justify-content: center;

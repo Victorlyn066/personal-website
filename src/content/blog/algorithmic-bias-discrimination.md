@@ -3,6 +3,7 @@ title: 'Algorithmic Bias and Discrimination: The Role of Law in Ensuring Fairnes
 description: 'Uncover how hidden biases in AI—from faulty hiring bots to unfair predictive policing—can be tamed by smart legal reforms that turn our digital decision‑makers into champions of fairness and equality.'
 pubDate: 'July 28 2025'
 heroImage: '../../assets/blog-placeholder-5.jpg'
+slug: 'algorithmic-bias-discrimination'
 ---
 
 ### Introduction: When Algorithms Become Judges
@@ -60,4 +61,4 @@ Beyond legislation, it's crucial to foster a broader cultural shift towards ethi
 
 ### Conclusion: Crafting a Fair Algorithmic Future
 
-Algorithmic bias isn't merely a technical glitch—it’s a profound societal issue demanding urgent attention. The law plays a pivotal role in safeguarding fairness and protecting against digital discrimination. By crafting targeted legal interventions and fostering ethical practices, Australia can ensure that algorithms serve society fairly, transparently, and equitably, shaping a more inclusive digital future.
+Algorithmic bias isn't merely a technical glitch—it's a profound societal issue demanding urgent attention. The law plays a pivotal role in safeguarding fairness and protecting against digital discrimination. By crafting targeted legal interventions and fostering ethical practices, Australia can ensure that algorithms serve society fairly, transparently, and equitably, shaping a more inclusive digital future. 

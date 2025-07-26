@@ -3,6 +3,7 @@ title: 'The Rise of Generative AI and IP Challenges: Navigating Ownership in AI-
 description: 'Exploring the intricate legal puzzle of who owns AI-generated creativity, this article delves into the evolving intersection between groundbreaking generative AI technology and traditional intellectual property laws'
 pubDate: 'July 26 2025'
 heroImage: '../../assets/blog-placeholder-4.jpg'
+slug: 'generative-ai-ip-challenges'
 ---
 
 ### Introduction: AI at the Intersection of Creativity and Law
@@ -30,7 +31,7 @@ The **Copyright Act 1968 (Cth)** currently lacks clear provisions addressing AI-
 - **Section 32:** Provides protection for original literary, dramatic, musical, and artistic works, defining the categories of protectable works clearly.
 - **Section 35:** Establishes the duration of copyright protection, generally lasting for the life of the author plus 70 years, emphasizing the human-centric nature of copyright.
 - **Section 36:** Clarifies the ownership of copyright, typically vesting initially in the author or creator, unless otherwise agreed upon or assigned.
-- **Section 40:** Outlines fair dealing exceptions, which allow limited uses of copyrighted materials without infringement for purposes such as research, study, criticism, review, parody, or news reporting. This provision is particularly significant for AI training, as stakeholders debate whether AI’s ingestion of copyrighted material might fall under fair dealing.
+- **Section 40:** Outlines fair dealing exceptions, which allow limited uses of copyrighted materials without infringement for purposes such as research, study, criticism, review, parody, or news reporting. This provision is particularly significant for AI training, as stakeholders debate whether AI's ingestion of copyrighted material might fall under fair dealing.
 - **Section 196:** Details moral rights, specifically the rights of attribution and integrity, which may be complex to apply when the author is not human.
 
 
@@ -44,4 +45,4 @@ As regulators worldwide race to update laws to address these uncertainties, Aust
 
 ### Conclusion: Navigating the Future of AI and IP
 
-Ultimately, navigating ownership in AI-generated works is not merely an exercise in legal gymnastics—it's central to shaping the future of creativity and technological progress. Generative AI's rapid ascent demands equally dynamic responses from the law, ensuring that intellectual property frameworks remain relevant and effective in a rapidly evolving digital landscape.
+Ultimately, navigating ownership in AI-generated works is not merely an exercise in legal gymnastics—it's central to shaping the future of creativity and technological progress. Generative AI's rapid ascent demands equally dynamic responses from the law, ensuring that intellectual property frameworks remain relevant and effective in a rapidly evolving digital landscape. 

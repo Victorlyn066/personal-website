@@ -3,6 +3,7 @@ title: 'Regulating Deepfakes: Balancing Freedom of Expression with Privacy and R
 description: 'Exploring the fascinating yet alarming world of deepfakes, this article dives into how we can regulate digital illusions without sacrificing free speech or privacy.'
 pubDate: 'July 27 2025'
 heroImage: '../../assets/blog-placeholder-2.jpg'
+slug: 'regulating-deepfakes'
 ---
 
 ### Introduction: The Double-Edged Sword of Digital Manipulation
@@ -57,4 +58,4 @@ Beyond legislation, public awareness and digital literacy initiatives will be es
 
 ### Conclusion: A Balanced Approach for the Digital Age
 
-Regulating deepfakes is not about stifling innovation or limiting legitimate expression. Rather, it's about crafting nuanced laws that protect individuals from harm while preserving essential freedoms. As deepfake technology evolves rapidly, Australia's response must be equally dynamic—promoting responsible use and robust protections that safeguard both democratic discourse and individual dignity in the digital age.
+Regulating deepfakes is not about stifling innovation or limiting legitimate expression. Rather, it's about crafting nuanced laws that protect individuals from harm while preserving essential freedoms. As deepfake technology evolves rapidly, Australia's response must be equally dynamic—promoting responsible use and robust protections that safeguard both democratic discourse and individual dignity in the digital age. 

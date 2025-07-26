@@ -58,10 +58,23 @@ export default function handler(req, res) {
 
     const commentsStore = loadCommentsStore();
     const comments = commentsStore[postSlug] || [];
-    console.log('Loaded comments from storage:', comments.length);
-    console.log('Storage file exists:', existsSync(STORAGE_FILE));
+    
+    console.log('🔍 DEBUG INFO:');
+    console.log('  - Requested postSlug:', postSlug);
+    console.log('  - Available posts in storage:', Object.keys(commentsStore));
+    console.log('  - Comments for this post:', comments.length);
+    console.log('  - Storage file exists:', existsSync(STORAGE_FILE));
+    console.log('  - Full storage data:', JSON.stringify(commentsStore, null, 2));
 
-    return res.status(200).json({ comments });
+    return res.status(200).json({ 
+      comments,
+      debug: {
+        requestedPostSlug: postSlug,
+        availablePosts: Object.keys(commentsStore),
+        totalPosts: Object.keys(commentsStore).length,
+        storageFileExists: existsSync(STORAGE_FILE)
+      }
+    });
   }
 
   if (req.method === 'POST') {

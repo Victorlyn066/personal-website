@@ -1,51 +1,125 @@
 // Vercel Function for comments API  
-// Using simple global storage with GitHub backup
-// This provides shared storage that works immediately
+// Using Supabase for permanent database storage
+// Comments persist forever across all cold starts and deployments
 
-// Global storage for immediate functionality
+import { createClient } from '@supabase/supabase-js';
+
+// Supabase configuration
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
+
+let supabase = null;
+if (supabaseUrl && supabaseKey) {
+  supabase = createClient(supabaseUrl, supabaseKey);
+  console.log('✅ Supabase client initialized');
+} else {
+  console.log('⚠️ Supabase not configured, using fallback storage');
+}
+
+// Fallback global storage if Supabase not available
 global.commentsStore = global.commentsStore || {};
 
 async function loadCommentsStore() {
   try {
-    console.log('📁 Loading comments from global storage...');
-    
-    // Try to load from GitHub data file as fallback
-    if (Object.keys(global.commentsStore).length === 0) {
-      try {
-        const response = await fetch('https://raw.githubusercontent.com/Victorlyn066/personal-website/main/data/comments.json');
-        if (response.ok) {
-          const data = await response.json();
-          global.commentsStore = data.comments || {};
-          console.log('📥 Loaded initial data from GitHub');
-        }
-      } catch (error) {
-        console.log('ℹ️ No initial data found, starting fresh');
+    if (supabase) {
+      console.log('📁 Loading comments from Supabase database...');
+      
+      const { data, error } = await supabase
+        .from('comments')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        throw error;
       }
+      
+      // Convert database rows to our comment structure
+      const store = {};
+      data.forEach(row => {
+        if (!store[row.post_slug]) {
+          store[row.post_slug] = [];
+        }
+        
+        const comment = {
+          id: row.id,
+          author: row.author,
+          content: row.content,
+          date: row.created_at,
+          userPicture: row.user_picture,
+          replies: row.replies || []
+        };
+        
+        store[row.post_slug].push(comment);
+      });
+      
+      console.log('📊 Available posts:', Object.keys(store));
+      console.log('📈 Total stored comments:', Object.values(store).reduce((sum, comments) => sum + (comments?.length || 0), 0));
+      return store;
+      
+    } else {
+      console.log('📁 Using fallback storage...');
+      return global.commentsStore;
     }
-    
-    console.log('📊 Available posts:', Object.keys(global.commentsStore));
-    console.log('📈 Total stored comments:', Object.values(global.commentsStore).reduce((sum, comments) => sum + (comments?.length || 0), 0));
-    return global.commentsStore;
   } catch (error) {
-    console.error('❌ Error loading comments:', error);
-    global.commentsStore = global.commentsStore || {};
+    console.error('❌ Error loading from Supabase:', error);
+    console.log('📁 Falling back to global storage...');
     return global.commentsStore;
   }
 }
 
 async function saveCommentsStore(store) {
+  // We don't use this function with Supabase - we save individual comments instead
+  global.commentsStore = store;
+}
+
+async function saveComment(postSlug, comment) {
   try {
-    console.log('💾 Saving comments to global storage...');
-    global.commentsStore = store;
-    console.log('✅ Comments saved successfully');
-    console.log('📊 Saved posts:', Object.keys(store));
-    console.log('📈 Total comments:', Object.values(store).reduce((sum, comments) => sum + (comments?.length || 0), 0));
-    
-    // In a real implementation, you'd sync this to a database
-    // For now, the global storage provides shared functionality within the same function instance
+    if (supabase) {
+      console.log('💾 Saving comment to Supabase database...');
+      
+      const { data, error } = await supabase
+        .from('comments')
+        .insert({
+          post_slug: postSlug,
+          author: comment.author,
+          content: comment.content,
+          user_picture: comment.userPicture,
+          replies: comment.replies || [],
+          created_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+      
+      if (error) {
+        throw error;
+      }
+      
+      console.log('✅ Comment saved to database permanently');
+      return {
+        id: data.id,
+        author: data.author,
+        content: data.content,
+        date: data.created_at,
+        userPicture: data.user_picture,
+        replies: data.replies || []
+      };
+      
+    } else {
+      console.log('💾 Saving to fallback storage...');
+      if (!global.commentsStore[postSlug]) {
+        global.commentsStore[postSlug] = [];
+      }
+      const newComment = {
+        ...comment,
+        id: `comment_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        date: new Date().toISOString()
+      };
+      global.commentsStore[postSlug].unshift(newComment);
+      return newComment;
+    }
   } catch (error) {
-    console.error('❌ Error saving comments:', error);
-    global.commentsStore = store;
+    console.error('❌ Error saving comment:', error);
+    throw error;
   }
 }
 
@@ -85,9 +159,9 @@ export default async function handler(req, res) {
           requestedPostSlug: postSlug,
           availablePosts: Object.keys(commentsStore),
           totalPosts: Object.keys(commentsStore).length,
-          storageType: 'global-storage-simple',
-          functionalSharing: 'immediate-within-instance',
-          globalStorageActive: true
+          storageType: supabase ? 'supabase-permanent-database' : 'fallback-temporary',
+          permanentStorage: !!supabase,
+          supabaseConfigured: !!(supabaseUrl && supabaseKey)
         }
       });
     } catch (error) {
@@ -163,29 +237,17 @@ export default async function handler(req, res) {
 
       // Handle regular comment submission
       if (comment) {
-        console.log('3. Adding comment to storage...');
+        console.log('3. Adding comment to database...');
 
-        // Create new comment
-        const newComment = {
-          ...comment,
-          id: `comment_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-          date: new Date().toISOString(),
-          replies: comment.replies || []
-        };
+        const savedComment = await saveComment(postSlug, comment);
 
-        // Add to storage
-        commentsStore[postSlug].unshift(newComment);
-
-        console.log('4. Comment added successfully:', newComment);
-        console.log('5. Total comments now:', commentsStore[postSlug].length);
-        console.log('6. Saving updated comments to storage...');
-        await saveCommentsStore(commentsStore);
+        console.log('4. Comment saved permanently:', savedComment);
 
         return res.status(201).json({
           success: true,
-          comment: newComment,
-          total: commentsStore[postSlug].length,
-          action: 'comment'
+          comment: savedComment,
+          action: 'comment',
+          storage: supabase ? 'supabase-permanent' : 'fallback-temporary'
         });
       }
 

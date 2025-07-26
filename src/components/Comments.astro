@@ -680,26 +680,27 @@ const { postSlug } = Astro.props;
   }
 
   .reply-form textarea {
-    width: 100%;
-    border: none;
-    border-radius: 12px;
-    padding: 1rem;
-    font-size: 0.95rem;
+    width: 100% !important;
+    border: 2px solid #e9ecef !important;
+    border-radius: 6px !important;
+    padding: 0.75rem !important;
+    font-size: 1rem !important;
     font-family: inherit;
     resize: vertical;
-    min-height: 90px;
+    min-height: 100px !important;
     box-sizing: border-box;
-    background: rgba(255, 255, 255, 0.08);
-    color: #e5e7eb;
-    transition: all 0.3s ease;
+    background: white !important;
+    color: #333 !important;
+    transition: border-color 0.3s ease !important;
     line-height: 1.5;
   }
 
   .reply-form textarea:focus {
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
-    background: rgba(255, 255, 255, 0.12);
-    transform: scale(1.005);
+    outline: none !important;
+    border-color: #4285f4 !important;
+    box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1) !important;
+    background: white !important;
+    transform: none !important;
   }
 
   .reply-actions {
@@ -709,29 +710,29 @@ const { postSlug } = Astro.props;
   }
 
   .submit-reply-btn {
-    padding: 0.75rem 1.5rem;
-    background: #4285f4;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 1rem;
-    font-weight: 500;
+    padding: 0.75rem 1.5rem !important;
+    background: #4285f4 !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 6px !important;
+    font-size: 1rem !important;
+    font-weight: 500 !important;
     cursor: pointer;
     transition: background 0.3s ease;
   }
 
   .submit-reply-btn:hover {
-    background: #3367d6;
+    background: #3367d6 !important;
   }
 
   .cancel-reply-btn {
-    padding: 0.75rem 1.5rem;
-    background: #6c757d;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 1rem;
-    font-weight: 500;
+    padding: 0.75rem 1.5rem !important;
+    background: #6c757d !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 6px !important;
+    font-size: 1rem !important;
+    font-weight: 500 !important;
     cursor: pointer;
     transition: background 0.3s ease;
   }
@@ -810,17 +811,18 @@ const { postSlug } = Astro.props;
 
   html.dark .comment-form textarea,
   html.dark .reply-form textarea {
-    background: #2d3748;
-    border: none !important;
-    color: #e2e8f0;
+    background: #2d3748 !important;
+    border: 2px solid #4a5568 !important;
+    color: #e2e8f0 !important;
   }
 
   html.dark .comment-form textarea:focus,
   html.dark .reply-form textarea:focus {
-    border: none !important;
-    border-color: transparent !important;
-    border-width: 0 !important;
-    box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.3);
+    border: 2px solid #4285f4 !important;
+    border-color: #4285f4 !important;
+    border-width: 2px !important;
+    box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.3) !important;
+    background: #2d3748 !important;
   }
 
   html.dark .reply-item {

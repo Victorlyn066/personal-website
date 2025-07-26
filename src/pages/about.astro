@@ -324,6 +324,7 @@ import { SITE_TITLE } from '../consts';
          line-height: 1.7;
          margin-bottom: 2em;
          transition: color 0.3s ease;
+         animation: fadeInUp 0.6s ease-out 0.5s both;
        }
 
        /* Purpose navigation buttons */
@@ -337,6 +338,7 @@ import { SITE_TITLE } from '../consts';
          border-radius: 8px;
          justify-items: center;
          align-items: center;
+         animation: slideInUp 0.6s ease-out 0.8s both;
        }
 
        /* Mobile: keep 2x2 grid for better usability */
@@ -441,7 +443,7 @@ import { SITE_TITLE } from '../consts';
          background: #f0f8ff;
          border-left: 3px solid #2a72e5;
          font-style: italic;
-         animation: fadeInUp 0.4s ease-out 0.7s both;
+         animation: fadeInUp 0.6s ease-out 1.2s both;
        }
 
        .section h2 {
@@ -453,6 +455,11 @@ import { SITE_TITLE } from '../consts';
          position: relative;
          animation: slideInRight 1s ease-out 1.6s both;
          transition: color 0.3s ease, border-color 0.3s ease;
+       }
+
+       /* Purpose section heading specific animation */
+       .section#purpose h2 {
+         animation: slideInLeft 0.8s ease-out 0.2s both;
        }
        
        .section h2::after {

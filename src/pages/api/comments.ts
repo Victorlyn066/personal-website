@@ -1,60 +1,61 @@
 import type { APIRoute } from 'astro';
-
-// Simple in-memory storage for demo (you can replace with Vercel KV later)
-let commentsStore: Record<string, any[]> = {};
+import { getComments, addComment } from '../../lib/storage';
 
 export const GET: APIRoute = async ({ url }) => {
-  const postSlug = url.searchParams.get('postSlug');
-  
-  if (!postSlug) {
-    return new Response(JSON.stringify({ error: 'postSlug is required' }), {
-      status: 400,
+  try {
+    const postSlug = url.searchParams.get('postSlug');
+    
+    if (!postSlug) {
+      return new Response(JSON.stringify({ error: 'postSlug is required' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    const comments = getComments(postSlug);
+    
+    return new Response(JSON.stringify({ comments }), {
+      status: 200,
+      headers: { 
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      }
+    });
+  } catch (error) {
+    console.error('GET /api/comments error:', error);
+    return new Response(JSON.stringify({ error: 'Internal server error' }), {
+      status: 500,
       headers: { 'Content-Type': 'application/json' }
     });
   }
-
-  const comments = commentsStore[postSlug] || [];
-  
-  return new Response(JSON.stringify({ comments }), {
-    status: 200,
-    headers: { 
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*'
-    }
-  });
 };
 
 export const POST: APIRoute = async ({ request }) => {
   try {
+    console.log('POST /api/comments called');
     const body = await request.json();
+    console.log('Request body:', body);
+    
     const { postSlug, comment } = body;
 
     if (!postSlug || !comment) {
+      console.log('Missing postSlug or comment');
       return new Response(JSON.stringify({ error: 'postSlug and comment are required' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
       });
     }
 
-    // Initialize comments array for this post if it doesn't exist
-    if (!commentsStore[postSlug]) {
-      commentsStore[postSlug] = [];
-    }
+    // Add the new comment using shared storage
+    const newComment = addComment(postSlug, comment);
+    console.log('Comment added:', newComment);
 
-    // Add the new comment
-    const newComment = {
-      ...comment,
-      id: `comment_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      date: new Date().toISOString(),
-      replies: comment.replies || []
-    };
-
-    commentsStore[postSlug].unshift(newComment);
+    const totalComments = getComments(postSlug).length;
 
     return new Response(JSON.stringify({ 
       success: true, 
       comment: newComment,
-      total: commentsStore[postSlug].length 
+      total: totalComments
     }), {
       status: 201,
       headers: { 
@@ -64,7 +65,8 @@ export const POST: APIRoute = async ({ request }) => {
     });
     
   } catch (error) {
-    return new Response(JSON.stringify({ error: 'Invalid JSON' }), {
+    console.error('POST /api/comments error:', error);
+    return new Response(JSON.stringify({ error: 'Invalid JSON or server error' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' }
     });

@@ -1,9 +1,13 @@
 import type { APIRoute } from 'astro';
-import { getComments, addComment } from '../../lib/simple-storage';
+
+// Simple in-memory storage directly in this file
+let commentsStore: Record<string, any[]> = {};
 
 export const GET: APIRoute = async ({ url }) => {
   try {
+    console.log('=== GET /api/comments START ===');
     const postSlug = url.searchParams.get('postSlug');
+    console.log('postSlug:', postSlug);
     
     if (!postSlug) {
       return new Response(JSON.stringify({ error: 'postSlug is required' }), {
@@ -12,7 +16,8 @@ export const GET: APIRoute = async ({ url }) => {
       });
     }
 
-    const comments = getComments(postSlug);
+    const comments = commentsStore[postSlug] || [];
+    console.log('Found comments:', comments.length);
     
     return new Response(JSON.stringify({ comments }), {
       status: 200,
@@ -23,7 +28,10 @@ export const GET: APIRoute = async ({ url }) => {
     });
   } catch (error) {
     console.error('GET /api/comments error:', error);
-    return new Response(JSON.stringify({ error: 'Internal server error' }), {
+    return new Response(JSON.stringify({ 
+      error: 'Internal server error',
+      details: String(error)
+    }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
     });
@@ -48,17 +56,30 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     console.log('3. Adding comment to storage...');
-    // Add the new comment using shared storage
-    const newComment = addComment(postSlug, comment);
+    
+    // Initialize storage for this post if needed
+    if (!commentsStore[postSlug]) {
+      commentsStore[postSlug] = [];
+    }
+    
+    // Create new comment
+    const newComment = {
+      ...comment,
+      id: `comment_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      date: new Date().toISOString(),
+      replies: comment.replies || []
+    };
+    
+    // Add to storage
+    commentsStore[postSlug].unshift(newComment);
+    
     console.log('4. Comment added successfully:', newComment);
-
-    const allComments = getComments(postSlug);
-    const totalComments = allComments.length;
+    console.log('5. Total comments now:', commentsStore[postSlug].length);
 
     return new Response(JSON.stringify({ 
       success: true, 
       comment: newComment,
-      total: totalComments
+      total: commentsStore[postSlug].length
     }), {
       status: 201,
       headers: { 

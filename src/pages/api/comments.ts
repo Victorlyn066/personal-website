@@ -12,7 +12,7 @@ export const GET: APIRoute = async ({ url }) => {
       });
     }
 
-    const comments = getComments(postSlug);
+    const comments = await getComments(postSlug);
     
     return new Response(JSON.stringify({ comments }), {
       status: 200,
@@ -47,10 +47,11 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     // Add the new comment using shared storage
-    const newComment = addComment(postSlug, comment);
+    const newComment = await addComment(postSlug, comment);
     console.log('Comment added:', newComment);
 
-    const totalComments = getComments(postSlug).length;
+    const allComments = await getComments(postSlug);
+    const totalComments = allComments.length;
 
     return new Response(JSON.stringify({ 
       success: true, 

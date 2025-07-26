@@ -14,7 +14,7 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     // Add the reply using shared storage
-    const newReply = addReply(postSlug, parentCommentId, reply);
+    const newReply = await addReply(postSlug, parentCommentId, reply);
 
     if (!newReply) {
       return new Response(JSON.stringify({ error: 'Parent comment not found' }), {

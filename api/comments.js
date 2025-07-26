@@ -36,13 +36,7 @@ async function loadCommentsStore() {
       
       // Convert database rows to our comment structure
       const store = {};
-      
-      // Separate top-level comments from replies
-      const topLevelComments = data.filter(row => !row.parent_id);
-      const replyComments = data.filter(row => row.parent_id);
-      
-      // First, add all top-level comments
-      topLevelComments.forEach(row => {
+      data.forEach(row => {
         if (!store[row.post_slug]) {
           store[row.post_slug] = [];
         }
@@ -58,9 +52,6 @@ async function loadCommentsStore() {
         
         store[row.post_slug].push(comment);
       });
-      
-      // Note: Replies are now stored both as separate DB entries AND in parent replies array
-      // The replies array is used for display nesting, separate entries for database visibility
       
       console.log('📊 Available posts:', Object.keys(store));
       console.log('📈 Total stored comments:', Object.values(store).reduce((sum, comments) => sum + (comments?.length || 0), 0));
@@ -226,8 +217,7 @@ export default async function handler(req, res) {
                 content: newReply.content,
                 user_picture: newReply.userPicture,
                 replies: [],
-                created_at: new Date().toISOString(),
-                parent_id: parentCommentId  // Track which comment/reply this is responding to
+                created_at: new Date().toISOString()
               })
               .select()
               .single();

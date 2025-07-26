@@ -208,28 +208,7 @@ export default async function handler(req, res) {
           if (supabase) {
             console.log('💾 Adding reply to Supabase database...');
             
-            // SAVE REPLY AS SEPARATE DATABASE ENTRY (so it shows in database)
-            const { data: savedReply, error: saveError } = await supabase
-              .from('comments')
-              .insert({
-                post_slug: postSlug,
-                author: newReply.author,
-                content: newReply.content,
-                user_picture: newReply.userPicture,
-                replies: [],
-                created_at: new Date().toISOString()
-              })
-              .select()
-              .single();
-
-            if (saveError) {
-              throw saveError;
-            }
-
-            // Update the newReply with the database ID
-            newReply.id = savedReply.id;
-            
-            // ALSO update the parent's replies array for nested display
+            // Get all comments for this post to update parent's replies array
             const { data: allComments, error: fetchError } = await supabase
               .from('comments')
               .select('*')
@@ -281,22 +260,30 @@ export default async function handler(req, res) {
             
             const result = addReplyToTarget(allComments, parentCommentId, newReply);
             
-            if (result) {
-              // Update the top-level comment with the modified replies structure
-              await supabase
-                .from('comments')
-                .update({ replies: result.updatedReplies })
-                .eq('id', result.comment.id);
+            if (!result) {
+              console.log('4. ERROR - Parent comment/reply not found in database');
+              return res.status(404).json({ error: 'Parent comment or reply not found' });
             }
             
-            console.log('✅ Reply saved as separate database entry AND added to parent replies');
+            // Update the top-level comment with the modified replies structure
+            const { data, error: updateError } = await supabase
+              .from('comments')
+              .update({ replies: result.updatedReplies })
+              .eq('id', result.comment.id)
+              .select()
+              .single();
+            
+            if (updateError) {
+              throw updateError;
+            }
+            
+            console.log('✅ Reply added to parent comment replies array only');
             
             return res.status(201).json({
               success: true,
               reply: newReply,
               action: 'reply',
-              storage: 'supabase-permanent',
-              savedAsEntry: true
+              storage: 'supabase-permanent'
             });
             
           } else {

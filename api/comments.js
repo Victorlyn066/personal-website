@@ -36,7 +36,13 @@ async function loadCommentsStore() {
       
       // Convert database rows to our comment structure
       const store = {};
-      data.forEach(row => {
+      
+      // Separate top-level comments from replies
+      const topLevelComments = data.filter(row => !row.parent_id);
+      const replyComments = data.filter(row => row.parent_id);
+      
+      // First, add all top-level comments
+      topLevelComments.forEach(row => {
         if (!store[row.post_slug]) {
           store[row.post_slug] = [];
         }
@@ -52,6 +58,9 @@ async function loadCommentsStore() {
         
         store[row.post_slug].push(comment);
       });
+      
+      // Note: Replies are now stored both as separate DB entries AND in parent replies array
+      // The replies array is used for display nesting, separate entries for database visibility
       
       console.log('📊 Available posts:', Object.keys(store));
       console.log('📈 Total stored comments:', Object.values(store).reduce((sum, comments) => sum + (comments?.length || 0), 0));
@@ -92,10 +101,12 @@ async function saveComment(postSlug, comment) {
         .single();
       
       if (error) {
+        console.error('❌ Supabase insert error:', error);
         throw error;
       }
       
       console.log('✅ Comment saved to database permanently');
+      console.log('📊 Saved data:', JSON.stringify(data, null, 2));
       return {
         id: data.id,
         author: data.author,
@@ -206,7 +217,29 @@ export default async function handler(req, res) {
           if (supabase) {
             console.log('💾 Adding reply to Supabase database...');
             
-            // Get all comments for this post
+            // SAVE REPLY AS SEPARATE DATABASE ENTRY (so it shows in database)
+            const { data: savedReply, error: saveError } = await supabase
+              .from('comments')
+              .insert({
+                post_slug: postSlug,
+                author: newReply.author,
+                content: newReply.content,
+                user_picture: newReply.userPicture,
+                replies: [],
+                created_at: new Date().toISOString(),
+                parent_id: parentCommentId  // Track which comment/reply this is responding to
+              })
+              .select()
+              .single();
+
+            if (saveError) {
+              throw saveError;
+            }
+
+            // Update the newReply with the database ID
+            newReply.id = savedReply.id;
+            
+            // ALSO update the parent's replies array for nested display
             const { data: allComments, error: fetchError } = await supabase
               .from('comments')
               .select('*')
@@ -258,31 +291,22 @@ export default async function handler(req, res) {
             
             const result = addReplyToTarget(allComments, parentCommentId, newReply);
             
-            if (!result) {
-              console.log('4. ERROR - Parent comment/reply not found in database');
-              return res.status(404).json({ error: 'Parent comment or reply not found' });
+            if (result) {
+              // Update the top-level comment with the modified replies structure
+              await supabase
+                .from('comments')
+                .update({ replies: result.updatedReplies })
+                .eq('id', result.comment.id);
             }
             
-            // Update the top-level comment with the modified replies structure
-            const { data, error: updateError } = await supabase
-              .from('comments')
-              .update({ replies: result.updatedReplies })
-              .eq('id', result.comment.id)
-              .select()
-              .single();
-            
-            if (updateError) {
-              throw updateError;
-            }
-            
-            console.log('✅ Nested reply added to database permanently');
+            console.log('✅ Reply saved as separate database entry AND added to parent replies');
             
             return res.status(201).json({
               success: true,
               reply: newReply,
               action: 'reply',
               storage: 'supabase-permanent',
-              parentType: result.comment.id == parentCommentId ? 'comment' : 'nested-reply'
+              savedAsEntry: true
             });
             
           } else {

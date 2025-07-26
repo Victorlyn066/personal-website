@@ -195,22 +195,6 @@ export default async function handler(req, res) {
       if (action === 'reply' && parentCommentId && reply) {
         console.log('3. Adding reply to comment...');
         
-        // Find the parent comment and add reply
-        function addReplyToComment(comments, parentId, newReply) {
-          for (let comment of comments) {
-            if (comment.id === parentId) {
-              if (!comment.replies) comment.replies = [];
-              comment.replies.push(newReply);
-              return true;
-            }
-            // Check nested replies
-            if (comment.replies && addReplyToComment(comment.replies, parentId, newReply)) {
-              return true;
-            }
-          }
-          return false;
-        }
-
         const newReply = {
           ...reply,
           id: `reply_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -218,21 +202,87 @@ export default async function handler(req, res) {
           replies: []
         };
 
-        const replyAdded = addReplyToComment(commentsStore[postSlug], parentCommentId, newReply);
+        try {
+          if (supabase) {
+            console.log('💾 Adding reply to Supabase database...');
+            
+            // Get the parent comment from database
+            const { data: parentComment, error: fetchError } = await supabase
+              .from('comments')
+              .select('*')
+              .eq('id', parentCommentId)
+              .single();
+            
+            if (fetchError || !parentComment) {
+              console.log('4. ERROR - Parent comment not found in database');
+              return res.status(404).json({ error: 'Parent comment not found' });
+            }
+            
+            // Add reply to existing replies
+            const updatedReplies = [...(parentComment.replies || []), newReply];
+            
+            // Update the comment with new reply
+            const { data, error: updateError } = await supabase
+              .from('comments')
+              .update({ replies: updatedReplies })
+              .eq('id', parentCommentId)
+              .select()
+              .single();
+            
+            if (updateError) {
+              throw updateError;
+            }
+            
+            console.log('✅ Reply added to database permanently');
+            
+            return res.status(201).json({
+              success: true,
+              reply: newReply,
+              action: 'reply',
+              storage: 'supabase-permanent'
+            });
+            
+          } else {
+            console.log('💾 Adding reply to fallback storage...');
+            
+            // Fallback: Find the parent comment and add reply
+            function addReplyToComment(comments, parentId, newReply) {
+              for (let comment of comments) {
+                if (comment.id == parentId) {
+                  if (!comment.replies) comment.replies = [];
+                  comment.replies.push(newReply);
+                  return true;
+                }
+                // Check nested replies
+                if (comment.replies && addReplyToComment(comment.replies, parentId, newReply)) {
+                  return true;
+                }
+              }
+              return false;
+            }
 
-        if (replyAdded) {
-          console.log('4. Reply added successfully:', newReply);
-          console.log('5. Saving updated comments to storage...');
-          await saveCommentsStore(commentsStore);
-          
-          return res.status(201).json({
-            success: true,
-            reply: newReply,
-            action: 'reply'
+            const replyAdded = addReplyToComment(commentsStore[postSlug], parentCommentId, newReply);
+
+            if (replyAdded) {
+              console.log('4. Reply added successfully to fallback storage');
+              
+              return res.status(201).json({
+                success: true,
+                reply: newReply,
+                action: 'reply',
+                storage: 'fallback-temporary'
+              });
+            } else {
+              console.log('4. ERROR - Parent comment not found in fallback');
+              return res.status(404).json({ error: 'Parent comment not found' });
+            }
+          }
+        } catch (error) {
+          console.error('❌ Error adding reply:', error);
+          return res.status(500).json({ 
+            error: 'Failed to save reply', 
+            details: error.message 
           });
-        } else {
-          console.log('4. ERROR - Parent comment not found');
-          return res.status(404).json({ error: 'Parent comment not found' });
         }
       }
 

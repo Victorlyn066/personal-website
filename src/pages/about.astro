@@ -309,7 +309,64 @@ import { SITE_TITLE } from '../consts';
        .section.profile-section {
          display: block;
        }
-             .section h2 {
+
+       .section.website-purpose-section {
+         display: block;
+         margin-bottom: 3em;
+       }
+
+       .purpose-text {
+         font-size: 1.1em;
+         color: #444;
+         line-height: 1.7;
+         animation: fadeInUp 1s ease-out 1.2s both;
+         transition: color 0.3s ease;
+       }
+
+       .purpose-list {
+         margin: 2em 0;
+       }
+
+       .purpose-item {
+         margin-bottom: 2em;
+         padding: 1.5em;
+         background: #f8f9fa;
+         border-radius: 12px;
+         border-left: 4px solid #2a72e5;
+         transition: all 0.3s ease;
+       }
+
+       .purpose-item:hover {
+         background: #e8f4fd;
+         transform: translateY(-2px);
+         box-shadow: 0 4px 12px rgba(42, 114, 229, 0.15);
+       }
+
+       .purpose-item h4 {
+         font-size: 1.2em;
+         color: #2a72e5;
+         margin: 0 0 0.8em 0;
+         font-weight: 600;
+       }
+
+       .purpose-item p {
+         color: #555;
+         margin: 0;
+         line-height: 1.6;
+       }
+
+       .purpose-conclusion {
+         font-style: italic;
+         font-weight: 500;
+         color: #2a72e5;
+         background: #f0f8ff;
+         padding: 1.5em;
+         border-radius: 8px;
+         margin-top: 2em;
+         border-left: 4px solid #2a72e5;
+       }
+
+       .section h2 {
          font-size: 1.8em;
          color: #222;
          margin-bottom: 1em;
@@ -523,6 +580,36 @@ import { SITE_TITLE } from '../consts';
          background: #1a1a1a !important;
          border: 1px solid #333 !important;
          border-left: 3px solid #fff !important;
+       }
+
+       html.dark .purpose-text {
+         color: #ddd !important;
+       }
+
+       html.dark .purpose-item {
+         background: #1a1a1a !important;
+         border: 1px solid #333 !important;
+         border-left: 4px solid #4285f4 !important;
+       }
+
+       html.dark .purpose-item:hover {
+         background: #2a2a2a !important;
+         border: 1px solid #444 !important;
+         box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3) !important;
+       }
+
+       html.dark .purpose-item h4 {
+         color: #5ea3f5 !important;
+       }
+
+       html.dark .purpose-item p {
+         color: #ccc !important;
+       }
+
+       html.dark .purpose-conclusion {
+         background: #1a2332 !important;
+         color: #5ea3f5 !important;
+         border-left: 4px solid #4285f4 !important;
        }
        
        html.dark .experience-item:hover,
@@ -906,6 +993,36 @@ import { SITE_TITLE } from '../consts';
       <p class="subtitle">Law & Computer Science Student | Technology and Legal Professional | Aspiring Technology Lawyer</p>
     </div>
     <main class="about-container">
+      <section class="section website-purpose-section">
+        <h2>Why I Created This Website</h2>
+        <div class="purpose-text">
+          <p>
+            In today's digital landscape, I believe that having a personal website is essential for any professional, especially for someone at the intersection of law and technology like myself. This website serves multiple purposes:
+          </p>
+          <div class="purpose-list">
+            <div class="purpose-item">
+              <h4>🌐 Digital Presence & Professional Identity</h4>
+              <p>As someone aspiring to work in technology law, I wanted to demonstrate my ability to bridge the gap between legal expertise and technological understanding. This website showcases not just my qualifications, but my hands-on experience with web development and digital platforms.</p>
+            </div>
+            <div class="purpose-item">
+              <h4>📝 Knowledge Sharing & Thought Leadership</h4>
+              <p>Through the blog section, I aim to share insights about the evolving landscape of technology law, AI regulations, and the intersection of legal practice with emerging technologies. This helps establish thought leadership in my field of interest.</p>
+            </div>
+            <div class="purpose-item">
+              <h4>🔗 Networking & Connection</h4>
+              <p>This platform serves as a central hub where potential employers, colleagues, and collaborators can learn about my background, view my work, and easily get in touch. It's designed to facilitate meaningful professional connections.</p>
+            </div>
+            <div class="purpose-item">
+              <h4>💡 Continuous Learning & Growth</h4>
+              <p>Building and maintaining this website allows me to stay current with web technologies, user experience design, and digital communication strategies – all valuable skills in today's technology-driven legal environment.</p>
+            </div>
+          </div>
+          <p class="purpose-conclusion">
+            Ultimately, this website represents my commitment to embracing technology in legal practice and my vision for the future of law in our increasingly digital world.
+          </p>
+        </div>
+      </section>
+
       <section class="section profile-section">
         <h2>About Me</h2>
         <div class="profile-text">

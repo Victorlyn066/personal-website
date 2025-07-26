@@ -1,5 +1,5 @@
 # Astro Starter Kit: Blog 
-<!-- Deploy trigger - Supabase permanent storage deployed -->
+<!-- Deploy trigger - POST RATE LIMIT RETRY -->
 
 ```sh
 npm create astro@latest -- --template blog

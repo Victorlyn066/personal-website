@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { addReply } from '../../lib/storage';
+import { addReply } from '../../lib/simple-storage';
 
 export const POST: APIRoute = async ({ request }) => {
   try {
@@ -14,7 +14,7 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     // Add the reply using shared storage
-    const newReply = await addReply(postSlug, parentCommentId, reply);
+    const newReply = addReply(postSlug, parentCommentId, reply);
 
     if (!newReply) {
       return new Response(JSON.stringify({ error: 'Parent comment not found' }), {

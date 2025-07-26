@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { getComments, addComment } from '../../lib/storage';
+import { getComments, addComment } from '../../lib/simple-storage';
 
 export const GET: APIRoute = async ({ url }) => {
   try {
@@ -12,7 +12,7 @@ export const GET: APIRoute = async ({ url }) => {
       });
     }
 
-    const comments = await getComments(postSlug);
+    const comments = getComments(postSlug);
     
     return new Response(JSON.stringify({ comments }), {
       status: 200,
@@ -47,10 +47,10 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     // Add the new comment using shared storage
-    const newComment = await addComment(postSlug, comment);
+    const newComment = addComment(postSlug, comment);
     console.log('Comment added:', newComment);
 
-    const allComments = await getComments(postSlug);
+    const allComments = getComments(postSlug);
     const totalComments = allComments.length;
 
     return new Response(JSON.stringify({ 

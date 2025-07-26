@@ -11,12 +11,8 @@ const { postSlug } = Astro.props;
 
 <div class="comments-section" id="comments-section" data-post-slug={postSlug}>
   <div class="comments-header">
-  <h3>Comments</h3>
-  <div class="storage-info">
-    <span class="storage-notice">💾 Comments stored locally</span>
-    <button id="storage-info-btn" class="info-btn" title="Learn about comment storage">ℹ️</button>
+    <h3>Comments</h3>
   </div>
-</div>
   
   <!-- Login Section -->
   <div id="login-section" class="login-section">
@@ -1772,7 +1768,7 @@ const { postSlug } = Astro.props;
       if (textarea) textarea.value = '';
     }
     
-    function handleCommentSubmit(e: any) {
+    async function handleCommentSubmit(e: any) {
       e.preventDefault();
       
       if (!currentUser) return;
@@ -1783,33 +1779,56 @@ const { postSlug } = Astro.props;
       if (!commentText) return;
       
       const comment = {
-        id: 'comment_' + Date.now(),
-        postSlug: postSlug,
         author: currentUser.name,
         content: commentText,
-        date: new Date().toISOString(),
-        timestamp: Date.now(),
         userPicture: currentUser.picture,
         replies: []
       };
       
-      saveComment(comment);
-      loadComments();
-      hideCommentForm();
+      const result = await saveComment(comment);
+      if (result) {
+        textarea.value = '';
+        await loadComments();
+        hideCommentForm();
+      }
     }
     
-    function saveComment(comment: any) {
-      const commentsKey = `comments_${postSlug}`;
-      let comments = JSON.parse(localStorage.getItem(commentsKey) || '[]');
-      comments.unshift(comment); // Add to beginning (newest first)
-      localStorage.setItem(commentsKey, JSON.stringify(comments));
+    async function saveComment(comment: any) {
+      try {
+        const response = await fetch('/api/comments', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            postSlug: postSlug,
+            comment: comment
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to save comment');
+        }
+        
+        return await response.json();
+      } catch (error) {
+        console.error('Error saving comment:', error);
+        alert('Failed to save comment. Please try again.');
+      }
     }
     
-    function loadComments() {
-      const commentsKey = `comments_${postSlug}`;
-      const comments = JSON.parse(localStorage.getItem(commentsKey) || '[]');
-      
+    async function loadComments() {
       if (!commentsList) return;
+      
+      try {
+        const response = await fetch(`/api/comments?postSlug=${encodeURIComponent(postSlug)}`);
+        
+        if (!response.ok) {
+          throw new Error('Failed to load comments');
+        }
+        
+        const data = await response.json();
+        const comments = data.comments || [];
       
       if (comments.length === 0) {
         commentsList.innerHTML = '<div class="no-comments">💬 No comments yet. Be the first to share your thoughts!</div>';
@@ -1862,6 +1881,10 @@ const { postSlug } = Astro.props;
           ${repliesHtml}
         `;
       }).join('');
+      } catch (error) {
+        console.error('Error loading comments:', error);
+        commentsList.innerHTML = '<div class="no-comments">❌ Failed to load comments.</div>';
+      }
     }
     
     function formatDate(dateString: any) {

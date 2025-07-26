@@ -1,17 +1,32 @@
 // Debug endpoint to check comment storage
-// Using the same global storage as the main API
+// Using Vercel KV for persistent storage
 
-global.commentsStore = global.commentsStore || {};
+import { kv } from '@vercel/kv';
 
-function loadCommentsStore() {
-  return global.commentsStore;
+const COMMENTS_KEY = 'blog_comments_store';
+
+async function loadCommentsStore() {
+  try {
+    const store = await kv.get(COMMENTS_KEY) || {};
+    return store;
+  } catch (error) {
+    console.error('Error loading from KV:', error);
+    global.commentsStore = global.commentsStore || {};
+    return global.commentsStore;
+  }
 }
 
-function saveCommentsStore(store) {
-  global.commentsStore = store;
+async function saveCommentsStore(store) {
+  try {
+    await kv.set(COMMENTS_KEY, store);
+    global.commentsStore = store;
+  } catch (error) {
+    console.error('Error saving to KV:', error);
+    global.commentsStore = store;
+  }
 }
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -23,7 +38,7 @@ export default function handler(req, res) {
   }
 
   if (req.method === 'GET') {
-    const store = loadCommentsStore();
+    const store = await loadCommentsStore();
     
     return res.status(200).json({
       debug: true,
@@ -42,7 +57,7 @@ export default function handler(req, res) {
 
   if (req.method === 'POST') {
     // Test endpoint to add a dummy comment
-    const store = loadCommentsStore();
+    const store = await loadCommentsStore();
     const testComment = {
       id: `test_${Date.now()}`,
       author: 'Test User',
@@ -58,7 +73,7 @@ export default function handler(req, res) {
     }
     store[postSlug].unshift(testComment);
     
-    saveCommentsStore(store);
+    await saveCommentsStore(store);
     return res.status(200).json({
       success: true,
       message: 'Test comment added',

@@ -1,26 +1,43 @@
 // Vercel Function for comments API
-// Using global variable for demo purposes (will reset on cold starts)
-// In production, you'd want to use Vercel KV, Supabase, or another database
+// Using Vercel KV for persistent storage across cold starts
 
-// IMPORTANT: This is a simple solution for immediate functionality
-// Global storage that resets on function cold starts but works within the same instance
-global.commentsStore = global.commentsStore || {};
+import { kv } from '@vercel/kv';
 
-function loadCommentsStore() {
-  console.log('📁 Loading comments from global storage');
-  console.log('📊 Available posts:', Object.keys(global.commentsStore));
-  console.log('📈 Total stored comments:', Object.values(global.commentsStore).reduce((sum, comments) => sum + (comments?.length || 0), 0));
-  return global.commentsStore;
+const COMMENTS_KEY = 'blog_comments_store';
+
+async function loadCommentsStore() {
+  try {
+    console.log('📁 Loading comments from Vercel KV...');
+    const store = await kv.get(COMMENTS_KEY) || {};
+    console.log('📊 Available posts:', Object.keys(store));
+    console.log('📈 Total stored comments:', Object.values(store).reduce((sum, comments) => sum + (comments?.length || 0), 0));
+    return store;
+  } catch (error) {
+    console.error('❌ Error loading from KV, using fallback:', error);
+    // Fallback to global storage if KV fails
+    global.commentsStore = global.commentsStore || {};
+    return global.commentsStore;
+  }
 }
 
-function saveCommentsStore(store) {
-  global.commentsStore = store;
-  console.log('💾 Comments saved to global storage');
-  console.log('📊 Saved posts:', Object.keys(store));
-  console.log('📈 Total comments:', Object.values(store).reduce((sum, comments) => sum + (comments?.length || 0), 0));
+async function saveCommentsStore(store) {
+  try {
+    console.log('💾 Saving comments to Vercel KV...');
+    await kv.set(COMMENTS_KEY, store);
+    console.log('✅ Comments saved to KV successfully');
+    console.log('📊 Saved posts:', Object.keys(store));
+    console.log('📈 Total comments:', Object.values(store).reduce((sum, comments) => sum + (comments?.length || 0), 0));
+    
+    // Also keep in global as cache
+    global.commentsStore = store;
+  } catch (error) {
+    console.error('❌ Error saving to KV, using global fallback:', error);
+    // Fallback to global storage if KV fails
+    global.commentsStore = store;
+  }
 }
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -40,24 +57,30 @@ export default function handler(req, res) {
       return res.status(400).json({ error: 'postSlug is required' });
     }
 
-    const commentsStore = loadCommentsStore();
-    const comments = commentsStore[postSlug] || [];
-    
-    console.log('🔍 DEBUG INFO:');
-    console.log('  - Requested postSlug:', postSlug);
-    console.log('  - Available posts in storage:', Object.keys(commentsStore));
-    console.log('  - Comments for this post:', comments.length);
-    console.log('  - Full storage data:', JSON.stringify(commentsStore, null, 2));
+    try {
+      const commentsStore = await loadCommentsStore();
+      const comments = commentsStore[postSlug] || [];
+      
+      console.log('🔍 DEBUG INFO:');
+      console.log('  - Requested postSlug:', postSlug);
+      console.log('  - Available posts in storage:', Object.keys(commentsStore));
+      console.log('  - Comments for this post:', comments.length);
+      console.log('  - Full storage data:', JSON.stringify(commentsStore, null, 2));
 
-    return res.status(200).json({ 
-      comments,
-      debug: {
-        requestedPostSlug: postSlug,
-        availablePosts: Object.keys(commentsStore),
-        totalPosts: Object.keys(commentsStore).length,
-        globalStorageExists: !!global.commentsStore
-      }
-    });
+      return res.status(200).json({ 
+        comments,
+        debug: {
+          requestedPostSlug: postSlug,
+          availablePosts: Object.keys(commentsStore),
+          totalPosts: Object.keys(commentsStore).length,
+          storageType: 'vercel-kv-with-fallback',
+          kvAvailable: !!process.env.KV_REST_API_URL
+        }
+      });
+    } catch (error) {
+      console.error('❌ Error in GET /api/comments:', error);
+      return res.status(500).json({ error: 'Failed to load comments', details: error.message });
+    }
   }
 
   if (req.method === 'POST') {
@@ -73,7 +96,7 @@ export default function handler(req, res) {
       }
 
       // Load current storage
-      const commentsStore = loadCommentsStore();
+      const commentsStore = await loadCommentsStore();
       
       // Initialize storage for this post if needed
       if (!commentsStore[postSlug]) {
@@ -112,7 +135,7 @@ export default function handler(req, res) {
         if (replyAdded) {
           console.log('4. Reply added successfully:', newReply);
           console.log('5. Saving updated comments to storage...');
-          saveCommentsStore(commentsStore);
+          await saveCommentsStore(commentsStore);
           
           return res.status(201).json({
             success: true,
@@ -143,7 +166,7 @@ export default function handler(req, res) {
         console.log('4. Comment added successfully:', newComment);
         console.log('5. Total comments now:', commentsStore[postSlug].length);
         console.log('6. Saving updated comments to storage...');
-        saveCommentsStore(commentsStore);
+        await saveCommentsStore(commentsStore);
 
         return res.status(201).json({
           success: true,

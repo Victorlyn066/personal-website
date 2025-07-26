@@ -1,6 +1,6 @@
 ---
 title: 'Communicating Privacy: Bridging Australian Law and Emerging Technologies'
-description: 'In an age of AI and big data, "Communicating Privacy" reveals how Australia's robust legal safeguards and cutting‑edge privacy technologies can be distilled into clear, compelling "privacy cards" and real‑world narratives to demystify risks, build trust, and empower users.'
+description: 'In an age of AI and big data, "Communicating Privacy" reveals how Australia''s robust legal safeguards and cutting‑edge privacy technologies can be distilled into clear, compelling "privacy cards" and real‑world narratives to demystify risks, build trust, and empower users.'
 pubDate: 'Jul 24 2025'
 heroImage: '../../assets/blog-placeholder-3.jpg'
 slug: 'communicating-privacy-australian-law'

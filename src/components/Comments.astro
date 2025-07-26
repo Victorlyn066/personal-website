@@ -461,6 +461,21 @@ const { postSlug } = Astro.props;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
 
+  /* Add extra spacing between comment threads */
+  .comment-thread {
+    margin-bottom: 2.5rem;
+  }
+
+  /* Reduce spacing for the main comment within a thread */
+  .comment-thread .comment-item {
+    margin-bottom: 0.5rem;
+  }
+
+  /* Add spacing after reply sections */
+  .replies-section {
+    margin-bottom: 1rem;
+  }
+
   .comment-body {
     width: 100%;
   }

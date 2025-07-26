@@ -1,39 +1,23 @@
 // Vercel Function for comments API
-// This works with static Astro builds
+// Using global variable for demo purposes (will reset on cold starts)
+// In production, you'd want to use Vercel KV, Supabase, or another database
 
-import { readFileSync, writeFileSync, existsSync } from 'fs';
-import { join } from 'path';
-
-// File-based storage that persists across function invocations
-const STORAGE_FILE = '/tmp/comments.json';
+// IMPORTANT: This is a simple solution for immediate functionality
+// Global storage that resets on function cold starts but works within the same instance
+global.commentsStore = global.commentsStore || {};
 
 function loadCommentsStore() {
-  try {
-    if (existsSync(STORAGE_FILE)) {
-      console.log('📁 Loading existing comments from storage file');
-      const data = readFileSync(STORAGE_FILE, 'utf8');
-      const store = JSON.parse(data);
-      console.log('📊 Loaded store with posts:', Object.keys(store));
-      return store;
-    } else {
-      console.log('📁 No storage file exists, starting with empty store');
-    }
-  } catch (error) {
-    console.error('❌ Error loading comments store:', error);
-  }
-  return {};
+  console.log('📁 Loading comments from global storage');
+  console.log('📊 Available posts:', Object.keys(global.commentsStore));
+  console.log('📈 Total stored comments:', Object.values(global.commentsStore).reduce((sum, comments) => sum + (comments?.length || 0), 0));
+  return global.commentsStore;
 }
 
 function saveCommentsStore(store) {
-  try {
-    writeFileSync(STORAGE_FILE, JSON.stringify(store, null, 2));
-    console.log('💾 Comments store saved successfully');
-    console.log('📊 Saved store with posts:', Object.keys(store));
-    const totalComments = Object.values(store).reduce((sum, comments) => sum + comments.length, 0);
-    console.log('📈 Total comments across all posts:', totalComments);
-  } catch (error) {
-    console.error('❌ Error saving comments store:', error);
-  }
+  global.commentsStore = store;
+  console.log('💾 Comments saved to global storage');
+  console.log('📊 Saved posts:', Object.keys(store));
+  console.log('📈 Total comments:', Object.values(store).reduce((sum, comments) => sum + (comments?.length || 0), 0));
 }
 
 export default function handler(req, res) {
@@ -63,7 +47,6 @@ export default function handler(req, res) {
     console.log('  - Requested postSlug:', postSlug);
     console.log('  - Available posts in storage:', Object.keys(commentsStore));
     console.log('  - Comments for this post:', comments.length);
-    console.log('  - Storage file exists:', existsSync(STORAGE_FILE));
     console.log('  - Full storage data:', JSON.stringify(commentsStore, null, 2));
 
     return res.status(200).json({ 
@@ -72,7 +55,7 @@ export default function handler(req, res) {
         requestedPostSlug: postSlug,
         availablePosts: Object.keys(commentsStore),
         totalPosts: Object.keys(commentsStore).length,
-        storageFileExists: existsSync(STORAGE_FILE)
+        globalStorageExists: !!global.commentsStore
       }
     });
   }

@@ -1,18 +1,14 @@
 // Debug endpoint to check comment storage
-import { readFileSync, writeFileSync, existsSync } from 'fs';
+// Using the same global storage as the main API
 
-const STORAGE_FILE = '/tmp/comments.json';
+global.commentsStore = global.commentsStore || {};
 
 function loadCommentsStore() {
-  try {
-    if (existsSync(STORAGE_FILE)) {
-      const data = readFileSync(STORAGE_FILE, 'utf8');
-      return JSON.parse(data);
-    }
-  } catch (error) {
-    console.error('Error loading comments store:', error);
-  }
-  return {};
+  return global.commentsStore;
+}
+
+function saveCommentsStore(store) {
+  global.commentsStore = store;
 }
 
 export default function handler(req, res) {
@@ -32,8 +28,8 @@ export default function handler(req, res) {
     return res.status(200).json({
       debug: true,
       timestamp: new Date().toISOString(),
-      storageFileExists: existsSync(STORAGE_FILE),
-      storageFilePath: STORAGE_FILE,
+      globalStorageExists: !!global.commentsStore,
+      storageType: 'global-variable',
       totalPosts: Object.keys(store).length,
       allData: store,
       posts: Object.keys(store).map(postSlug => ({
@@ -62,20 +58,13 @@ export default function handler(req, res) {
     }
     store[postSlug].unshift(testComment);
     
-    try {
-      writeFileSync(STORAGE_FILE, JSON.stringify(store, null, 2));
-      return res.status(200).json({
-        success: true,
-        message: 'Test comment added',
-        testComment,
-        totalComments: store[postSlug].length
-      });
-    } catch (error) {
-      return res.status(500).json({
-        error: 'Failed to save test comment',
-        details: error.message
-      });
-    }
+    saveCommentsStore(store);
+    return res.status(200).json({
+      success: true,
+      message: 'Test comment added',
+      testComment,
+      totalComments: store[postSlug].length
+    });
   }
 
   return res.status(405).json({ error: 'Method not allowed' });

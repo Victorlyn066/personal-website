@@ -1,5 +1,6 @@
-// Vercel Function for comments API
+// Vercel Function for comments API  
 // Using Vercel KV for persistent storage across cold starts
+// Updated to force redeploy with KV environment variables
 
 import { kv } from '@vercel/kv';
 

@@ -1061,6 +1061,42 @@ const { postSlug } = Astro.props;
     color: white !important;
   }
 
+  /* Fix Google Identity Services button in dark mode - comprehensive approach */
+  html.dark .g_id_signin,
+  html.dark .g_id_signin iframe,
+  html.dark .google-signin-centered .g_id_signin,
+  html.dark .google-signin-centered iframe {
+    background: #374151 !important;
+    border: 1px solid #4b5563 !important;
+    border-radius: 6px !important;
+  }
+
+  /* Target Google button content specifically */
+  html.dark .g_id_signin div,
+  html.dark .g_id_signin span,
+  html.dark .google-signin-centered div[role="button"],
+  html.dark .google-signin-centered span {
+    background: #374151 !important;
+    color: #e2e8f0 !important;
+    border: none !important;
+  }
+
+  /* Mobile-specific Google button dark mode fix */
+  @media (max-width: 768px) {
+    html.dark .g_id_signin,
+    html.dark .google-signin-centered > div {
+      background-color: #374151 !important;
+      border: 1px solid #4b5563 !important;
+      border-radius: 6px !important;
+      color: #e2e8f0 !important;
+    }
+    
+    html.dark .g_id_signin * {
+      background-color: #374151 !important;
+      color: #e2e8f0 !important;
+    }
+  }
+
   /* Ensure login section text is readable in dark mode */
   html.dark .login-section h4 {
     color: #e2e8f0 !important;
@@ -1131,7 +1167,7 @@ const { postSlug } = Astro.props;
   .new-reply-cancel:hover {
     background: #5a6268 !important;
   }
-
+  
   /* Dark mode for new reply form */
   html.dark .new-reply-form {
     background: #1a202c !important;

@@ -2322,7 +2322,7 @@ const { postSlug } = Astro.props;
       return false;
     }
 
-    (window as any).submitReply = function(parentId: string) {
+    (window as any).submitReply = async function(parentId: string) {
       if (!currentUser) return;
       
       const replyForm = document.getElementById(`reply-form-${parentId}`);
@@ -2332,24 +2332,44 @@ const { postSlug } = Astro.props;
       if (!replyText) return;
       
       const reply = {
-        id: 'reply_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
         author: currentUser.name,
         content: replyText,
-        date: new Date().toISOString(),
-        timestamp: Date.now(),
-        userPicture: currentUser.picture,
-        replies: [] // Initialize empty replies array for infinite nesting
+        userPicture: currentUser.picture
       };
       
-      const commentsKey = `comments_${postSlug}`;
-      let comments = JSON.parse(localStorage.getItem(commentsKey) || '[]');
-      
-      // Add reply to the correct parent (could be deep in the tree)
-      addReplyToComment(comments, parentId, reply);
-      
-      localStorage.setItem(commentsKey, JSON.stringify(comments));
-      loadComments();
-      (window as any).hideReplyForm(parentId);
+      try {
+        console.log('Submitting reply via API...');
+        const response = await fetch('/api/comments', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            postSlug: postSlug,
+            parentCommentId: parentId,
+            reply: reply,
+            action: 'reply'
+          })
+        });
+
+        const result = await response.json();
+        console.log('Reply API response:', result);
+
+        if (response.ok && result.success) {
+          console.log('Reply submitted successfully');
+          // Clear the form
+          textarea.value = '';
+          // Reload comments to show the new reply
+          loadComments();
+          (window as any).hideReplyForm(parentId);
+        } else {
+          console.error('Failed to submit reply:', result.error);
+          alert('Failed to submit reply: ' + (result.error || 'Unknown error'));
+        }
+      } catch (error) {
+        console.error('Error submitting reply:', error);
+        alert('Failed to submit reply. Please try again.');
+      }
     };
   });
 </script> 

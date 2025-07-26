@@ -22,7 +22,9 @@ Features:
 - ✅ RSS Feed support
 - ✅ Markdown & MDX support
 
-## 🚀 Project Structure
+## 🚀 Project Structure 
+
+<!-- Force deploy trigger -->
 
 Inside of your Astro project, you'll see the following folders and files:
 

@@ -310,60 +310,90 @@ import { SITE_TITLE } from '../consts';
          display: block;
        }
 
-       .section.website-purpose-section {
-         display: block;
-         margin-bottom: 3em;
-       }
-
-       .purpose-text {
+       /* Purpose section intro */
+       .purpose-intro {
          font-size: 1.1em;
          color: #444;
          line-height: 1.7;
-         animation: fadeInUp 1s ease-out 1.2s both;
+         margin-bottom: 2em;
          transition: color 0.3s ease;
        }
 
-       .purpose-list {
-         margin: 2em 0;
+       /* Purpose navigation buttons */
+       .purpose-nav {
+         display: flex;
+         flex-wrap: wrap;
+         gap: 0.5em;
+         margin-bottom: 2em;
+         padding: 0.5em;
+         background: #f8f9fa;
+         border-radius: 8px;
+         overflow-x: auto;
+         scrollbar-width: thin;
+         scrollbar-color: #ccc transparent;
        }
 
-       .purpose-item {
-         margin-bottom: 2em;
-         padding: 1.5em;
-         background: #f8f9fa;
-         border-radius: 12px;
-         border-left: 4px solid #2a72e5;
+       .purpose-button {
+         background: #fff;
+         border: 1px solid #ddd;
+         color: #666;
+         padding: 0.6em 1.2em;
+         border-radius: 6px;
+         cursor: pointer;
          transition: all 0.3s ease;
+         font-size: 0.9em;
+         font-weight: 500;
+         white-space: nowrap;
+         flex-shrink: 0;
+       }
+
+       .purpose-button:hover {
+         background: #e8f4fd;
+         border-color: #2a72e5;
+         color: #2a72e5;
+       }
+
+       .purpose-button.active {
+         background: #2a72e5;
+         border-color: #2a72e5;
+         color: white;
+       }
+
+       /* Purpose items - styled like experience items */
+       .purpose-item {
+         display: none;
+         background: white;
+         padding: 1.25rem;
+         border-radius: 12px;
+         border: none;
+         margin-bottom: 1.5rem;
+         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+         transition: all 0.2s ease;
+         animation: fadeIn 0.3s ease-out;
+         color: #444;
+         background: #f8f9fa;
+         border-left: 3px solid #2a72e5;
+       }
+
+       .purpose-item.active {
+         display: block;
        }
 
        .purpose-item:hover {
-         background: #e8f4fd;
-         transform: translateY(-2px);
-         box-shadow: 0 4px 12px rgba(42, 114, 229, 0.15);
-       }
-
-       .purpose-item h4 {
-         font-size: 1.2em;
-         color: #2a72e5;
-         margin: 0 0 0.8em 0;
-         font-weight: 600;
-       }
-
-       .purpose-item p {
-         color: #555;
-         margin: 0;
-         line-height: 1.6;
+         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
        }
 
        .purpose-conclusion {
-         font-style: italic;
-         font-weight: 500;
-         color: #2a72e5;
+         background: white;
+         padding: 1.25rem;
+         border-radius: 12px;
+         border: none;
+         margin-top: 2rem;
+         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+         color: #444;
          background: #f0f8ff;
-         padding: 1.5em;
-         border-radius: 8px;
-         margin-top: 2em;
-         border-left: 4px solid #2a72e5;
+         border-left: 3px solid #2a72e5;
+         font-style: italic;
        }
 
        .section h2 {
@@ -582,14 +612,38 @@ import { SITE_TITLE } from '../consts';
          border-left: 3px solid #fff !important;
        }
 
-       html.dark .purpose-text {
+       html.dark .purpose-intro {
          color: #ddd !important;
+       }
+
+       html.dark .purpose-nav {
+         background: #1a1a1a !important;
+         border: 1px solid #333 !important;
+       }
+
+       html.dark .purpose-button {
+         background: #2a2a2a !important;
+         border: 1px solid #444 !important;
+         color: #ccc !important;
+       }
+
+       html.dark .purpose-button:hover {
+         background: #333 !important;
+         border-color: #4285f4 !important;
+         color: #5ea3f5 !important;
+       }
+
+       html.dark .purpose-button.active {
+         background: #4285f4 !important;
+         border-color: #4285f4 !important;
+         color: white !important;
        }
 
        html.dark .purpose-item {
          background: #1a1a1a !important;
          border: 1px solid #333 !important;
-         border-left: 4px solid #4285f4 !important;
+         border-left: 3px solid #4285f4 !important;
+         color: #ddd !important;
        }
 
        html.dark .purpose-item:hover {
@@ -598,18 +652,10 @@ import { SITE_TITLE } from '../consts';
          box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3) !important;
        }
 
-       html.dark .purpose-item h4 {
-         color: #5ea3f5 !important;
-       }
-
-       html.dark .purpose-item p {
-         color: #ccc !important;
-       }
-
        html.dark .purpose-conclusion {
          background: #1a2332 !important;
-         color: #5ea3f5 !important;
-         border-left: 4px solid #4285f4 !important;
+         color: #ddd !important;
+         border-left: 3px solid #4285f4 !important;
        }
        
        html.dark .experience-item:hover,
@@ -993,36 +1039,6 @@ import { SITE_TITLE } from '../consts';
       <p class="subtitle">Law & Computer Science Student | Technology and Legal Professional | Aspiring Technology Lawyer</p>
     </div>
     <main class="about-container">
-      <section class="section website-purpose-section">
-        <h2>Why I Created This Website</h2>
-        <div class="purpose-text">
-          <p>
-            In today's digital landscape, I believe that having a personal website is essential for any professional, especially for someone at the intersection of law and technology like myself. This website serves multiple purposes:
-          </p>
-          <div class="purpose-list">
-            <div class="purpose-item">
-              <h4>🌐 Digital Presence & Professional Identity</h4>
-              <p>As someone aspiring to work in technology law, I wanted to demonstrate my ability to bridge the gap between legal expertise and technological understanding. This website showcases not just my qualifications, but my hands-on experience with web development and digital platforms.</p>
-            </div>
-            <div class="purpose-item">
-              <h4>📝 Knowledge Sharing & Thought Leadership</h4>
-              <p>Through the blog section, I aim to share insights about the evolving landscape of technology law, AI regulations, and the intersection of legal practice with emerging technologies. This helps establish thought leadership in my field of interest.</p>
-            </div>
-            <div class="purpose-item">
-              <h4>🔗 Networking & Connection</h4>
-              <p>This platform serves as a central hub where potential employers, colleagues, and collaborators can learn about my background, view my work, and easily get in touch. It's designed to facilitate meaningful professional connections.</p>
-            </div>
-            <div class="purpose-item">
-              <h4>💡 Continuous Learning & Growth</h4>
-              <p>Building and maintaining this website allows me to stay current with web technologies, user experience design, and digital communication strategies – all valuable skills in today's technology-driven legal environment.</p>
-            </div>
-          </div>
-          <p class="purpose-conclusion">
-            Ultimately, this website represents my commitment to embracing technology in legal practice and my vision for the future of law in our increasingly digital world.
-          </p>
-        </div>
-      </section>
-
       <section class="section profile-section">
         <h2>About Me</h2>
         <div class="profile-text">
@@ -1031,13 +1047,78 @@ import { SITE_TITLE } from '../consts';
       </section>
 
       <div class="section-nav">
-        <button class="nav-button active" data-section="experience">Professional Experience</button>
+        <button class="nav-button active" data-section="purpose">Why I Created This Website</button>
+        <button class="nav-button" data-section="experience">Professional Experience</button>
         <button class="nav-button" data-section="education">Education</button>
         <button class="nav-button" data-section="leadership">Leadership & Extra-Curricular</button>
         <button class="nav-button" data-section="projects">Projects</button>
       </div>
 
-      <section class="section active" id="experience">
+      <section class="section active" id="purpose">
+        <h2>Why I Created This Website</h2>
+        <div class="purpose-intro">
+          <p>In today's digital landscape, I believe that having a personal website is essential for any professional, especially for someone at the intersection of law and technology like myself. This website serves multiple purposes:</p>
+        </div>
+        
+        <div class="purpose-nav">
+          <button class="purpose-button active" data-purpose="digital">Digital Presence</button>
+          <button class="purpose-button" data-purpose="knowledge">Knowledge Sharing</button>
+          <button class="purpose-button" data-purpose="networking">Networking</button>
+          <button class="purpose-button" data-purpose="learning">Learning & Growth</button>
+        </div>
+
+        <div class="purpose-item active" id="digital">
+          <div class="item-header">
+            <div>
+              <h3 class="item-title">🌐 Digital Presence & Professional Identity</h3>
+            </div>
+          </div>
+          <div class="item-description">
+            As someone aspiring to work in technology law, I wanted to demonstrate my ability to bridge the gap between legal expertise and technological understanding. This website showcases not just my qualifications, but my hands-on experience with web development and digital platforms.
+          </div>
+        </div>
+
+        <div class="purpose-item" id="knowledge">
+          <div class="item-header">
+            <div>
+              <h3 class="item-title">📝 Knowledge Sharing & Thought Leadership</h3>
+            </div>
+          </div>
+          <div class="item-description">
+            Through the blog section, I aim to share insights about the evolving landscape of technology law, AI regulations, and the intersection of legal practice with emerging technologies. This helps establish thought leadership in my field of interest.
+          </div>
+        </div>
+
+        <div class="purpose-item" id="networking">
+          <div class="item-header">
+            <div>
+              <h3 class="item-title">🔗 Networking & Connection</h3>
+            </div>
+          </div>
+          <div class="item-description">
+            This platform serves as a central hub where potential employers, colleagues, and collaborators can learn about my background, view my work, and easily get in touch. It's designed to facilitate meaningful professional connections.
+          </div>
+        </div>
+
+        <div class="purpose-item" id="learning">
+          <div class="item-header">
+            <div>
+              <h3 class="item-title">💡 Continuous Learning & Growth</h3>
+            </div>
+          </div>
+          <div class="item-description">
+            Building and maintaining this website allows me to stay current with web technologies, user experience design, and digital communication strategies – all valuable skills in today's technology-driven legal environment.
+          </div>
+        </div>
+
+        <div class="purpose-conclusion">
+          <div class="item-description">
+            <strong>Ultimately, this website represents my commitment to embracing technology in legal practice and my vision for the future of law in our increasingly digital world.</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="experience">
         <h2>Professional Experience</h2>
         
         <div class="experience-item">
@@ -1455,6 +1536,39 @@ import { SITE_TITLE } from '../consts';
               console.log('Target section found:', targetSection);
               if (targetSection) {
                 targetSection.classList.add('active');
+              }
+            }
+            
+            // Add active class to clicked button
+            this.classList.add('active');
+          });
+        });
+
+        // Purpose section navigation
+        const purposeButtons = document.querySelectorAll('.purpose-button');
+        
+        purposeButtons.forEach(button => {
+          button.addEventListener('click', function(this: HTMLElement) {
+            const purposeId = this.getAttribute('data-purpose');
+            console.log('Switching to purpose:', purposeId);
+            
+            // Hide all purpose items
+            const allPurposeItems = document.querySelectorAll('.purpose-item');
+            allPurposeItems.forEach(item => {
+              item.classList.remove('active');
+            });
+            
+            // Remove active class from all purpose buttons
+            purposeButtons.forEach(btn => {
+              btn.classList.remove('active');
+            });
+            
+            // Show selected purpose item
+            if (purposeId) {
+              const targetItem = document.getElementById(purposeId);
+              console.log('Target purpose item found:', targetItem);
+              if (targetItem) {
+                targetItem.classList.add('active');
               }
             }
             

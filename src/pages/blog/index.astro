@@ -24,6 +24,11 @@ const posts = (await getCollection('blog')).sort(
 				justify-content: center;
 				margin-bottom: 2rem;
 				animation: slideInLeft 0.6s ease-out;
+				width: 100%;
+				max-width: 960px;
+				margin-left: auto;
+				margin-right: auto;
+				padding: 0 1rem;
 			}
 			
 			.search-box {
@@ -338,6 +343,27 @@ const posts = (await getCollection('blog')).sort(
 			}
 			
 			@media (max-width: 768px) {
+				.search-container {
+					max-width: calc(100% - 1rem);
+					padding: 0 0.5rem;
+					margin-bottom: 1.5rem;
+				}
+				
+				.search-input {
+					padding: 0.8rem 0.8rem 0.8rem 2.5rem;
+					font-size: 1rem;
+				}
+				
+				.search-icon {
+					left: 0.8rem;
+					font-size: 1rem;
+				}
+				
+				.clear-search {
+					right: 0.8rem;
+					font-size: 1rem;
+				}
+			
 				main {
 					width: 100%;
 					max-width: calc(100% - 1rem);
@@ -385,6 +411,26 @@ const posts = (await getCollection('blog')).sort(
 			}
 			
 			@media (max-width: 480px) {
+				.search-container {
+					max-width: calc(100% - 0.5rem);
+					padding: 0 0.25rem;
+				}
+				
+				.search-input {
+					padding: 0.75rem 0.75rem 0.75rem 2.25rem;
+					font-size: 0.9rem;
+				}
+				
+				.search-icon {
+					left: 0.75rem;
+					font-size: 0.9rem;
+				}
+				
+				.clear-search {
+					right: 0.75rem;
+					font-size: 0.9rem;
+				}
+			
 				main {
 					padding: 0.5rem 0.25rem;
 				}

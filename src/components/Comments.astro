@@ -1817,18 +1817,22 @@ const { postSlug } = Astro.props;
       }
     }
     
-    async function loadComments() {
+    async function loadComments(retryCount = 0) {
       if (!commentsList) return;
+      
+      console.log(`Loading comments (attempt ${retryCount + 1})...`);
       
       try {
         const response = await fetch(`/api/comments?postSlug=${encodeURIComponent(postSlug)}`);
         
         if (!response.ok) {
-          throw new Error('Failed to load comments');
+          throw new Error(`Failed to load comments: ${response.status} ${response.statusText}`);
         }
         
         const data = await response.json();
         const comments = data.comments || [];
+        
+        console.log(`✅ Successfully loaded ${comments.length} comments`);
       
       if (comments.length === 0) {
         commentsList.innerHTML = '<div class="no-comments">💬 No comments yet. Be the first to share your thoughts!</div>';
@@ -1882,8 +1886,19 @@ const { postSlug } = Astro.props;
         `;
       }).join('');
       } catch (error) {
-        console.error('Error loading comments:', error);
-        commentsList.innerHTML = '<div class="no-comments">❌ Failed to load comments.</div>';
+        console.error(`❌ Error loading comments (attempt ${retryCount + 1}):`, error);
+        
+        // Retry up to 3 times with exponential backoff
+        if (retryCount < 2) {
+          const retryDelay = Math.pow(2, retryCount) * 1000; // 1s, 2s, 4s
+          console.log(`Retrying in ${retryDelay}ms...`);
+          setTimeout(() => {
+            loadComments(retryCount + 1);
+          }, retryDelay);
+        } else {
+          console.error('❌ All retry attempts failed');
+          commentsList.innerHTML = '<div class="no-comments">❌ Failed to load comments. <button onclick="loadComments()" style="background: #4285f4; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; margin-left: 8px;">Retry</button></div>';
+        }
       }
     }
     
@@ -2031,43 +2046,15 @@ const { postSlug } = Astro.props;
       });
       console.log('✅ Cleared Google cookies');
       
-      // Show user feedback that logout is happening
-      const userSection = document.getElementById('user-section');
-      if (userSection) {
-        userSection.innerHTML = '<div style="color: #666; font-style: italic; padding: 1rem;">Signing out...</div>';
-      }
+      // Store scroll position before updating UI
+      const scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+      localStorage.setItem('blog-scroll-position', scrollPosition.toString());
       
-      console.log('🔄 Performing hard refresh (Cmd+Shift+R equivalent)...');
+      // Update UI immediately to show logged out state
+      showLoggedOutState();
       
-      // Try the most direct approach - keyboard simulation
-      setTimeout(() => {
-        console.log('Attempting to simulate Cmd+Shift+R...');
-        
-        // Method 1: Try to trigger browser refresh via keyboard event
-        try {
-          const event = new KeyboardEvent('keydown', {
-            key: 'r',
-            code: 'KeyR',
-            ctrlKey: true,
-            shiftKey: true,
-            metaKey: navigator.platform.indexOf('Mac') > -1, // Use Cmd on Mac, Ctrl on others
-            bubbles: true,
-            cancelable: true
-          });
-          document.dispatchEvent(event);
-          console.log('Dispatched hard refresh keyboard event');
-        } catch (e) {
-          console.log('Keyboard simulation failed:', e);
-        }
-        
-        // Method 2: Force reload with maximum cache bypass
-        setTimeout(() => {
-          console.log('Forcing window replacement...');
-          // This should work like a hard refresh
-          window.location.replace(window.location.protocol + '//' + window.location.host + window.location.pathname + window.location.search + (window.location.search ? '&' : '?') + '_t=' + Date.now());
-        }, 500);
-        
-      }, 100);
+      // Reload comments to show them without user context (no reply buttons)
+      loadComments();
       
       console.log('=== LOGOUT PROCESS COMPLETE ===');
     }
@@ -2296,10 +2283,8 @@ const { postSlug } = Astro.props;
     
     // Debug function to clear comments (temporary)
     (window as any).clearComments = function() {
-      const commentsKey = `comments_${postSlug}`;
-      localStorage.removeItem(commentsKey);
+      console.log('Comments cleared for testing - now using API only');
       loadComments();
-      console.log('Comments cleared for testing');
     };
 
     // Recursive function to find and add reply to nested comments

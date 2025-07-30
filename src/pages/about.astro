@@ -517,6 +517,27 @@ import { SITE_TITLE } from '../consts';
         animation: fadeInUp 0.4s ease-out both;
       }
 
+      /* Projects navigation - cleaner styling without boundary box */
+      .projects-nav {
+        display: flex;
+        justify-content: center;
+        gap: 0.3em;
+        margin-bottom: 2em;
+        padding: 0;
+        background: none;
+        border: none;
+        align-items: center;
+        animation: slideInUp 0.6s ease-out 0.8s both;
+      }
+
+      /* Mobile responsive for projects nav */
+      @media (max-width: 768px) {
+        .projects-nav {
+          gap: 0.2em;
+          margin-bottom: 1.5em;
+        }
+      }
+
        .section h2 {
          font-size: 1.8em;
          color: #222;
@@ -788,6 +809,10 @@ import { SITE_TITLE } from '../consts';
        html.dark .projects-subsection {
          background: #18181b !important;
          color: #fff !important;
+       }
+
+       html.dark .projects-nav {
+         background: none !important;
        }
        
        html.dark .experience-item:hover,
@@ -1546,7 +1571,7 @@ import { SITE_TITLE } from '../consts';
       <section class="section" id="projects">
         <h2>Projects</h2>
         
-        <div class="purpose-nav">
+        <div class="projects-nav">
           <button class="purpose-button active" data-projects="external">External</button>
           <button class="purpose-button" data-projects="personal">Personal</button>
         </div>

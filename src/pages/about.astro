@@ -249,6 +249,11 @@ import { SITE_TITLE } from '../consts';
        .section.active .activity-item {
          opacity: 0;
        }
+
+       .projects-subsection.active .experience-item,
+       .projects-subsection.active .activity-item {
+         opacity: 0;
+       }
        
               .section.active .experience-item:nth-of-type(1),
        .section.active .education-item:nth-of-type(1),
@@ -310,6 +315,55 @@ import { SITE_TITLE } from '../consts';
         .section.active .education-item:nth-of-type(9),
         .section.active .activity-item:nth-of-type(9) {
           animation: fadeInUp 0.4s ease-out 1.1s both;
+          opacity: 1;
+        }
+
+        /* Projects subsection animation triggers */
+        .projects-subsection.active .experience-item:nth-of-type(1),
+        .projects-subsection.active .activity-item:nth-of-type(1) {
+          animation: fadeInUp 0.4s ease-out 0.3s both;
+          opacity: 1;
+        }
+
+        .projects-subsection.active .experience-item:nth-of-type(2),
+        .projects-subsection.active .activity-item:nth-of-type(2) {
+          animation: fadeInUp 0.4s ease-out 0.4s both;
+          opacity: 1;
+        }
+
+        .projects-subsection.active .experience-item:nth-of-type(3),
+        .projects-subsection.active .activity-item:nth-of-type(3) {
+          animation: fadeInUp 0.4s ease-out 0.5s both;
+          opacity: 1;
+        }
+
+        .projects-subsection.active .experience-item:nth-of-type(4),
+        .projects-subsection.active .activity-item:nth-of-type(4) {
+          animation: fadeInUp 0.4s ease-out 0.6s both;
+          opacity: 1;
+        }
+
+        .projects-subsection.active .experience-item:nth-of-type(5),
+        .projects-subsection.active .activity-item:nth-of-type(5) {
+          animation: fadeInUp 0.4s ease-out 0.7s both;
+          opacity: 1;
+        }
+
+        .projects-subsection.active .experience-item:nth-of-type(6),
+        .projects-subsection.active .activity-item:nth-of-type(6) {
+          animation: fadeInUp 0.4s ease-out 0.8s both;
+          opacity: 1;
+        }
+
+        .projects-subsection.active .experience-item:nth-of-type(7),
+        .projects-subsection.active .activity-item:nth-of-type(7) {
+          animation: fadeInUp 0.4s ease-out 0.9s both;
+          opacity: 1;
+        }
+
+        .projects-subsection.active .experience-item:nth-of-type(8),
+        .projects-subsection.active .activity-item:nth-of-type(8) {
+          animation: fadeInUp 0.4s ease-out 1.0s both;
           opacity: 1;
         }
        
@@ -438,19 +492,30 @@ import { SITE_TITLE } from '../consts';
          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
        }
 
-       .purpose-conclusion {
-         background: white;
-         padding: 1.25rem;
-         border-radius: 12px;
-         border: none;
-         margin-top: 2rem;
-         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-         color: #444;
-         background: #f0f8ff;
-         border-left: 3px solid #2a72e5;
-         font-style: italic;
-         animation: fadeInUp 0.6s ease-out 1.2s both;
-       }
+             .purpose-conclusion {
+        background: white;
+        padding: 1.25rem;
+        border-radius: 12px;
+        border: none;
+        margin-top: 2rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        color: #444;
+        background: #f0f8ff;
+        border-left: 3px solid #2a72e5;
+        font-style: italic;
+        animation: fadeInUp 0.6s ease-out 1.2s both;
+      }
+
+      /* Projects subsection styling */
+      .projects-subsection {
+        display: none;
+        animation: fadeIn 0.3s ease-out;
+      }
+
+      .projects-subsection.active {
+        display: block;
+        animation: fadeInUp 0.4s ease-out both;
+      }
 
        .section h2 {
          font-size: 1.8em;
@@ -717,6 +782,12 @@ import { SITE_TITLE } from '../consts';
          background: #1a2332 !important;
          color: #ddd !important;
          border-left: 3px solid #4285f4 !important;
+       }
+
+       /* Dark mode support for projects subsections */
+       html.dark .projects-subsection {
+         background: #18181b !important;
+         color: #fff !important;
        }
        
        html.dark .experience-item:hover,
@@ -1474,100 +1545,162 @@ import { SITE_TITLE } from '../consts';
 
       <section class="section" id="projects">
         <h2>Projects</h2>
-
-        <div class="activity-item">
-          <div class="item-header">
-            <div>
-              <h3 class="item-title">Tech Law Blog</h3>
-            </div>
-            <span class="item-date">Jun 2025 - Current</span>
-          </div>
-          <div class="item-description">
-            A blog that shares my thoughts on technology, law, and the intersection of the two. Developed and designed by hand with JavaScript, TypeScript, HTML_first and Markdown. You are currently on it!
-          </div>
-        </div>
-
-        <div class="activity-item">
-          <div class="item-header">
-            <div>
-              <h3 class="item-title">Machine Learning Engine</h3>
-            </div>
-            <span class="item-date">Feb 2025 - Jun 2025</span>
-          </div>
-          <div class="item-description">
-            A high‑performance ML framework combining supervised and unsupervised algorithms in a unified Python pipeline, featuring automated data ingestion, feature engineering, hyperparameter optimization, model evaluation, and interactive visualizations on real‑world datasets.
-          </div>
-        </div>
-
-        <div class="activity-item">
-          <div class="item-header">
-            <div>
-              <h3 class="item-title">Collaborative Text Editor</h3>
-            </div>
-            <span class="item-date">Apr 2025 - Jun 2025</span>
-          </div>
-          <div class="item-description">
-            A C‑based, POSIX‑threaded server–client system that hosts a Markdown‑style document in a linked‑list structure, receives atomic edit and formatting commands over named‑pipe connections, enforces versioned concurrency control, and broadcasts real‑time updates to all connected clients.
-          </div>
-        </div>
-
-        <div class="activity-item">
-          <div class="item-header">
-            <div>
-              <h3 class="item-title">Audio Editing Engine</h3>
-            </div>
-            <span class="item-date">Feb 2025 - Apr 2025</span>
-          </div>
-          <div class="item-description">
-            An efficient C‑based audio‑editing backend that loads and saves WAV files, exposes sample‑level track operations (read, write, delete, insert) via a shared‑backing store for memory‑efficient editing, and includes cross‑correlation‑driven advertisement detection and removal.
-          </div>
-        </div>
-
-        <div class="activity-item">
-          <div class="item-header">
-            <div>
-              <h3 class="item-title">Cobhram Youth Justice Centre: Technology Implementation and Social Justice</h3>
-            </div>
-            <span class="item-date">Aug 2024 - Dec 2024</span>
-          </div>
-          <div class="item-description">
-            A project that engaged with the Cobham Youth Justice Centre to advise on how the detention centre can implement technology to raise the standard of care for the young people in their care and improve family engagement. This includes recommending a custom-built website and a mobile app to manage the centre's operations.
-          </div>
-        </div>
         
-        <div class="activity-item">
-          <div class="item-header">
-            <div>
-              <h3 class="item-title">Interactive LED Glow in the Dark Lamp Speaker System</h3>
+        <div class="purpose-nav">
+          <button class="purpose-button active" data-projects="external">External</button>
+          <button class="purpose-button" data-projects="personal">Personal</button>
+        </div>
+
+        <div class="projects-subsection active" id="external-projects">
+          <div class="experience-item">
+            <div class="item-header">
+              <div>
+                <h3 class="item-title">Haast: Adaptive US Market Intelligence for Regulatory Content Review</h3>
+                <p class="item-company">Haast (Legal Tech Startup)</p>
+              </div>
+              <span class="item-date">Jul 2025 - Current</span>
             </div>
-            <span class="item-date">Jan 2024 - May 2024</span>
+            <div class="item-description">
+              Haast is a high-growth legal tech startup leveraging AI to automate regulatory content review for enterprises. This 10-week project delivers an adaptive US market intelligence platform—providing real-time competitor mapping, industry segmentation, and pricing benchmarks specifically tailored for law-focused and compliance-driven markets. The result: actionable, continuously-updated strategies that empower Haast's team to navigate legal sector dynamics as they scale.
+            </div>
           </div>
-          <div class="item-description">
-            Designing a multi-functional lamp speaker system with its glow-in-the-dark feature and customisable LED colours. The lamp/speaker connects via Bluetooth to Spotify and users can interact with it through the built-in display system. The product serves as a comforting and therapeutic nightlight to promote mental well-being in young people. Experience in pitching the product to a panel of commercial and academic investors.
+
+          <div class="experience-item">
+            <div class="item-header">
+              <div>
+                <h3 class="item-title">Nexl One – The All-in-One Legal Operations Suite</h3>
+                <p class="item-company">Nexl (Legal Tech Company)</p>
+              </div>
+              <span class="item-date">Aug 2024 - Dec 2024</span>
+            </div>
+            <div class="item-description">
+              Nexl, a legal tech company empowering law firms with next-generation collaboration tools, will launch "Nexl One"—a unified platform combining advanced human resources and project management modules. By leveraging Nexl's CRM strengths, the project will streamline recruitment, staff retention, wellbeing tracking, and complex legal matter management. Nexl One aims to help law firms seamlessly manage both their people and projects within a single, integrated system.
+            </div>
+          </div>
+
+          <div class="experience-item">
+            <div class="item-header">
+              <div>
+                <h3 class="item-title">Fortus Fit G.Y.M. – Social Fitness Community Growth</h3>
+                <p class="item-company">Fortus Fit (Fitness Social App)</p>
+              </div>
+              <span class="item-date">Jan 2025 - Jun 2025</span>
+            </div>
+            <div class="item-description">
+              Fortus Fit, a gym-focused social app blending fitness tracking and community sharing, will implement the "G.Y.M." strategy—refining core features, adding personalized and social motivation tools, and driving user growth via university society partnerships and fitness expos to build Australia's leading gym community.
+            </div>
+          </div>
+
+          <div class="experience-item">
+            <div class="item-header">
+              <div>
+                <h3 class="item-title">MyPass US Entry – Compliance Innovation for Mining & Energy</h3>
+                <p class="item-company">MyPass (Workforce Compliance Startup)</p>
+              </div>
+              <span class="item-date">Aug 2023 - Dec 2023</span>
+            </div>
+            <div class="item-description">
+              MyPass, a workforce compliance start-up empowering workers with digital Skills Passports, will accelerate its entry into the US Mining and Oil & Gas sector through a three-part strategy: forming industry partnerships, hiring an expert Director of US Operations for direct sales, and launching an industry trial program to rapidly build brand awareness and client trust.
+            </div>
+          </div>
+
+          <div class="experience-item">
+            <div class="item-header">
+              <div>
+                <h3 class="item-title">Cobhram Youth Justice Centre: Technology Implementation and Social Justice</h3>
+                <p class="item-company">Cobhram Youth Justice Centre</p>
+              </div>
+              <span class="item-date">Aug 2024 - Dec 2024</span>
+            </div>
+            <div class="item-description">
+              A project that engaged with the Cobham Youth Justice Centre to advise on how the detention centre can implement technology to raise the standard of care for the young people in their care and improve family engagement. This includes recommending a custom-built website and a mobile app to manage the centre's operations.
+            </div>
           </div>
         </div>
 
-        <div class="activity-item">
-          <div class="item-header">
-            <div>
-              <h3 class="item-title">2-tape Deterministic Turing Machine</h3>
+        <div class="projects-subsection" id="personal-projects">
+          <div class="activity-item">
+            <div class="item-header">
+              <div>
+                <h3 class="item-title">Tech Law Blog</h3>
+              </div>
+              <span class="item-date">Jun 2025 - Current</span>
             </div>
-            <span class="item-date">Sep 2023 - Oct 2023</span>
+            <div class="item-description">
+              A blog that shares my thoughts on technology, law, and the intersection of the two. Developed and designed by hand with JavaScript, TypeScript, HTML_first and Markdown. You are currently on it!
+            </div>
           </div>
-          <div class="item-description">
-            A deterministic 2‑tape Turing machine that, given a finite‐automaton encoding on one tape and an input string on the other, decides in polynomial time whether the string is accepted—using direct simulation for DFAs and on‑the‑fly subset construction for NFAs..
-          </div>
-        </div>
 
-        <div class="activity-item">
-          <div class="item-header">
-            <div>
-              <h3 class="item-title">2-Dimensional Action Maze Runner Videogame</h3>
+          <div class="activity-item">
+            <div class="item-header">
+              <div>
+                <h3 class="item-title">Machine Learning Engine</h3>
+              </div>
+              <span class="item-date">Feb 2025 - Jun 2025</span>
             </div>
-            <span class="item-date">Feb 2023 - July 2023</span>
+            <div class="item-description">
+              A high‑performance ML framework combining supervised and unsupervised algorithms in a unified Python pipeline, featuring automated data ingestion, feature engineering, hyperparameter optimization, model evaluation, and interactive visualizations on real‑world datasets.
+            </div>
           </div>
-          <div class="item-description">
-            A 2-dimensional animated action game, where the player navigates through multiple challenging levels while being pursued by mobs armed with ricocheting projectiles.
+
+          <div class="activity-item">
+            <div class="item-header">
+              <div>
+                <h3 class="item-title">Collaborative Text Editor</h3>
+              </div>
+              <span class="item-date">Apr 2025 - Jun 2025</span>
+            </div>
+            <div class="item-description">
+              A C‑based, POSIX‑threaded server–client system that hosts a Markdown‑style document in a linked‑list structure, receives atomic edit and formatting commands over named‑pipe connections, enforces versioned concurrency control, and broadcasts real‑time updates to all connected clients.
+            </div>
+          </div>
+
+          <div class="activity-item">
+            <div class="item-header">
+              <div>
+                <h3 class="item-title">Audio Editing Engine</h3>
+              </div>
+              <span class="item-date">Feb 2025 - Apr 2025</span>
+            </div>
+            <div class="item-description">
+              An efficient C‑based audio‑editing backend that loads and saves WAV files, exposes sample‑level track operations (read, write, delete, insert) via a shared‑backing store for memory‑efficient editing, and includes cross‑correlation‑driven advertisement detection and removal.
+            </div>
+          </div>
+          
+          <div class="activity-item">
+            <div class="item-header">
+              <div>
+                <h3 class="item-title">Interactive LED Glow in the Dark Lamp Speaker System</h3>
+              </div>
+              <span class="item-date">Jan 2024 - May 2024</span>
+            </div>
+            <div class="item-description">
+              Designing a multi-functional lamp speaker system with its glow-in-the-dark feature and customisable LED colours. The lamp/speaker connects via Bluetooth to Spotify and users can interact with it through the built-in display system. The product serves as a comforting and therapeutic nightlight to promote mental well-being in young people. Experience in pitching the product to a panel of commercial and academic investors.
+            </div>
+          </div>
+
+          <div class="activity-item">
+            <div class="item-header">
+              <div>
+                <h3 class="item-title">2-tape Deterministic Turing Machine</h3>
+              </div>
+              <span class="item-date">Sep 2023 - Oct 2023</span>
+            </div>
+            <div class="item-description">
+              A deterministic 2‑tape Turing machine that, given a finite‐automaton encoding on one tape and an input string on the other, decides in polynomial time whether the string is accepted—using direct simulation for DFAs and on‑the‑fly subset construction for NFAs..
+            </div>
+          </div>
+
+          <div class="activity-item">
+            <div class="item-header">
+              <div>
+                <h3 class="item-title">2-Dimensional Action Maze Runner Videogame</h3>
+              </div>
+              <span class="item-date">Feb 2023 - July 2023</span>
+            </div>
+            <div class="item-description">
+              A 2-dimensional animated action game, where the player navigates through multiple challenging levels while being pursued by mobs armed with ricocheting projectiles.
+            </div>
           </div>
         </div>
       </section>
@@ -1616,30 +1749,59 @@ import { SITE_TITLE } from '../consts';
         purposeButtons.forEach(button => {
           button.addEventListener('click', function(this: HTMLElement) {
             const purposeId = this.getAttribute('data-purpose');
-            console.log('Switching to purpose:', purposeId);
+            const projectsId = this.getAttribute('data-projects');
             
-            // Hide all purpose items
-            const allPurposeItems = document.querySelectorAll('.purpose-item');
-            allPurposeItems.forEach(item => {
-              item.classList.remove('active');
-            });
-            
-            // Remove active class from all purpose buttons
-            purposeButtons.forEach(btn => {
-              btn.classList.remove('active');
-            });
-            
-            // Show selected purpose item
             if (purposeId) {
+              console.log('Switching to purpose:', purposeId);
+              
+              // Hide all purpose items
+              const allPurposeItems = document.querySelectorAll('.purpose-item');
+              allPurposeItems.forEach(item => {
+                item.classList.remove('active');
+              });
+              
+              // Remove active class from all purpose buttons in purpose section
+              const purposeSectionButtons = document.querySelectorAll('.purpose-button[data-purpose]');
+              purposeSectionButtons.forEach(btn => {
+                btn.classList.remove('active');
+              });
+              
+              // Show selected purpose item
               const targetItem = document.getElementById(purposeId);
               console.log('Target purpose item found:', targetItem);
               if (targetItem) {
                 targetItem.classList.add('active');
               }
+              
+              // Add active class to clicked button
+              this.classList.add('active');
             }
             
-            // Add active class to clicked button
-            this.classList.add('active');
+            if (projectsId) {
+              console.log('Switching to projects:', projectsId);
+              
+              // Hide all projects subsections
+              const allProjectsSubsections = document.querySelectorAll('.projects-subsection');
+              allProjectsSubsections.forEach(item => {
+                item.classList.remove('active');
+              });
+              
+              // Remove active class from all projects buttons
+              const projectsButtons = document.querySelectorAll('.purpose-button[data-projects]');
+              projectsButtons.forEach(btn => {
+                btn.classList.remove('active');
+              });
+              
+              // Show selected projects subsection
+              const targetSubsection = document.getElementById(projectsId + '-projects');
+              console.log('Target projects subsection found:', targetSubsection);
+              if (targetSubsection) {
+                targetSubsection.classList.add('active');
+              }
+              
+              // Add active class to clicked button
+              this.classList.add('active');
+            }
           });
         });
       });
